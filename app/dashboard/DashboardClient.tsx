@@ -392,9 +392,9 @@ export function DashboardClient({ user, esims, orders, stats }: DashboardClientP
             <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {[
                 { icon: Plus, title: 'Buy New eSIM', desc: 'Browse 190+ destinations', href: '/destinations' },
-                { icon: QrCode, title: 'Scan QR Code', desc: 'Install your eSIM', href: '#' },
+                { icon: QrCode, title: 'Install eSIM', desc: 'Installation guide', href: '/help/install-esim' },
                 { icon: Globe, title: 'Check Coverage', desc: 'View network details', href: '/coverage' },
-                { icon: CreditCard, title: 'Add Payment', desc: 'Manage payment methods', href: '/settings/payment' },
+                { icon: CreditCard, title: 'Get Support', desc: 'Help & FAQ', href: '/help' },
               ].map((action, i) => (
                 <Link
                   key={i}
