@@ -579,3 +579,19 @@ h3 { font-size: clamp(1.25rem, 2vw, 1.75rem); }
 @media (prefers-color-scheme: dark) {
   /* Keeping light mode for now per design */
 }
+
+/* Mapbox Popup Styles */
+.mapboxgl-popup-content {
+  padding: 0 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15) !important;
+  overflow: hidden;
+}
+
+.mapboxgl-popup-tip {
+  border-top-color: white !important;
+}
+
+.coverage-popup .mapboxgl-popup-content {
+  background: white;
+}

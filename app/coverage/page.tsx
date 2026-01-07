@@ -11,52 +11,52 @@ import 'mapbox-gl/dist/mapbox-gl.css'
 
 mapboxgl.accessToken = 'pk.eyJ1IjoiaWFtc2VyZ2VlZWUiLCJhIjoiY21pejJsemozMGkyOTNmczdjajh6M2ZlbSJ9.uCtGI0geWe_8T59AVdjAVw'
 
-// Countries with eSIM coverage
+// Countries with eSIM coverage and starting prices
 const coveredCountries = [
-  { code: 'JP', name: 'Japan', region: 'Asia', networks: ['NTT Docomo', 'SoftBank', 'KDDI'], coordinates: [138.2529, 36.2048] },
-  { code: 'KR', name: 'South Korea', region: 'Asia', networks: ['SK Telecom', 'KT', 'LG U+'], coordinates: [127.7669, 35.9078] },
-  { code: 'TH', name: 'Thailand', region: 'Asia', networks: ['AIS', 'DTAC', 'TrueMove'], coordinates: [100.9925, 15.8700] },
-  { code: 'SG', name: 'Singapore', region: 'Asia', networks: ['Singtel', 'StarHub', 'M1'], coordinates: [103.8198, 1.3521] },
-  { code: 'MY', name: 'Malaysia', region: 'Asia', networks: ['Maxis', 'Celcom', 'Digi'], coordinates: [101.9758, 4.2105] },
-  { code: 'ID', name: 'Indonesia', region: 'Asia', networks: ['Telkomsel', 'XL', 'Indosat'], coordinates: [113.9213, -0.7893] },
-  { code: 'VN', name: 'Vietnam', region: 'Asia', networks: ['Viettel', 'Mobifone', 'Vinaphone'], coordinates: [108.2772, 14.0583] },
-  { code: 'PH', name: 'Philippines', region: 'Asia', networks: ['Globe', 'Smart', 'DITO'], coordinates: [121.7740, 12.8797] },
-  { code: 'TW', name: 'Taiwan', region: 'Asia', networks: ['Chunghwa', 'Taiwan Mobile', 'FarEasTone'], coordinates: [120.9605, 23.6978] },
-  { code: 'HK', name: 'Hong Kong', region: 'Asia', networks: ['3 HK', 'CSL', 'SmarTone'], coordinates: [114.1694, 22.3193] },
-  { code: 'CN', name: 'China', region: 'Asia', networks: ['China Mobile', 'China Unicom', 'China Telecom'], coordinates: [104.1954, 35.8617] },
-  { code: 'IN', name: 'India', region: 'Asia', networks: ['Jio', 'Airtel', 'Vi'], coordinates: [78.9629, 20.5937] },
-  { code: 'US', name: 'United States', region: 'Americas', networks: ['AT&T', 'T-Mobile', 'Verizon'], coordinates: [-95.7129, 37.0902] },
-  { code: 'CA', name: 'Canada', region: 'Americas', networks: ['Rogers', 'Bell', 'Telus'], coordinates: [-106.3468, 56.1304] },
-  { code: 'MX', name: 'Mexico', region: 'Americas', networks: ['Telcel', 'AT&T', 'Movistar'], coordinates: [-102.5528, 23.6345] },
-  { code: 'BR', name: 'Brazil', region: 'Americas', networks: ['Vivo', 'Claro', 'TIM'], coordinates: [-51.9253, -14.2350] },
-  { code: 'AR', name: 'Argentina', region: 'Americas', networks: ['Claro', 'Movistar', 'Personal'], coordinates: [-63.6167, -38.4161] },
-  { code: 'GB', name: 'United Kingdom', region: 'Europe', networks: ['EE', 'Vodafone', 'Three'], coordinates: [-3.4360, 55.3781] },
-  { code: 'FR', name: 'France', region: 'Europe', networks: ['Orange', 'SFR', 'Bouygues'], coordinates: [2.2137, 46.2276] },
-  { code: 'DE', name: 'Germany', region: 'Europe', networks: ['Telekom', 'Vodafone', 'O2'], coordinates: [10.4515, 51.1657] },
-  { code: 'IT', name: 'Italy', region: 'Europe', networks: ['TIM', 'Vodafone', 'WindTre'], coordinates: [12.5674, 41.8719] },
-  { code: 'ES', name: 'Spain', region: 'Europe', networks: ['Movistar', 'Vodafone', 'Orange'], coordinates: [-3.7492, 40.4637] },
-  { code: 'NL', name: 'Netherlands', region: 'Europe', networks: ['KPN', 'Vodafone', 'T-Mobile'], coordinates: [5.2913, 52.1326] },
-  { code: 'PT', name: 'Portugal', region: 'Europe', networks: ['MEO', 'NOS', 'Vodafone'], coordinates: [-8.2245, 39.3999] },
-  { code: 'CH', name: 'Switzerland', region: 'Europe', networks: ['Swisscom', 'Sunrise', 'Salt'], coordinates: [8.2275, 46.8182] },
-  { code: 'AT', name: 'Austria', region: 'Europe', networks: ['A1', 'Magenta', 'Drei'], coordinates: [14.5501, 47.5162] },
-  { code: 'BE', name: 'Belgium', region: 'Europe', networks: ['Proximus', 'Orange', 'Base'], coordinates: [4.4699, 50.5039] },
-  { code: 'SE', name: 'Sweden', region: 'Europe', networks: ['Telia', 'Tele2', 'Tre'], coordinates: [18.6435, 60.1282] },
-  { code: 'NO', name: 'Norway', region: 'Europe', networks: ['Telenor', 'Telia', 'Ice'], coordinates: [8.4689, 60.4720] },
-  { code: 'DK', name: 'Denmark', region: 'Europe', networks: ['TDC', 'Telenor', 'Telia'], coordinates: [9.5018, 56.2639] },
-  { code: 'FI', name: 'Finland', region: 'Europe', networks: ['Elisa', 'DNA', 'Telia'], coordinates: [25.7482, 61.9241] },
-  { code: 'IE', name: 'Ireland', region: 'Europe', networks: ['Vodafone', 'Three', 'Eir'], coordinates: [-8.2439, 53.4129] },
-  { code: 'PL', name: 'Poland', region: 'Europe', networks: ['Orange', 'T-Mobile', 'Plus'], coordinates: [19.1451, 51.9194] },
-  { code: 'CZ', name: 'Czech Republic', region: 'Europe', networks: ['O2', 'T-Mobile', 'Vodafone'], coordinates: [15.4730, 49.8175] },
-  { code: 'GR', name: 'Greece', region: 'Europe', networks: ['Cosmote', 'Vodafone', 'Wind'], coordinates: [21.8243, 39.0742] },
-  { code: 'AU', name: 'Australia', region: 'Oceania', networks: ['Telstra', 'Optus', 'Vodafone'], coordinates: [133.7751, -25.2744] },
-  { code: 'NZ', name: 'New Zealand', region: 'Oceania', networks: ['Spark', 'Vodafone', '2degrees'], coordinates: [174.8860, -40.9006] },
-  { code: 'AE', name: 'UAE', region: 'Middle East', networks: ['Etisalat', 'Du'], coordinates: [53.8478, 23.4241] },
-  { code: 'TR', name: 'Turkey', region: 'Middle East', networks: ['Turkcell', 'Vodafone', 'Türk Telekom'], coordinates: [35.2433, 38.9637] },
-  { code: 'IL', name: 'Israel', region: 'Middle East', networks: ['Pelephone', 'Cellcom', 'Partner'], coordinates: [34.8516, 31.0461] },
-  { code: 'SA', name: 'Saudi Arabia', region: 'Middle East', networks: ['STC', 'Mobily', 'Zain'], coordinates: [45.0792, 23.8859] },
-  { code: 'ZA', name: 'South Africa', region: 'Africa', networks: ['Vodacom', 'MTN', 'Cell C'], coordinates: [22.9375, -30.5595] },
-  { code: 'EG', name: 'Egypt', region: 'Africa', networks: ['Vodafone', 'Orange', 'Etisalat'], coordinates: [30.8025, 26.8206] },
-  { code: 'MA', name: 'Morocco', region: 'Africa', networks: ['Maroc Telecom', 'Orange', 'Inwi'], coordinates: [-7.0926, 31.7917] },
+  { code: 'JP', name: 'Japan', region: 'Asia', networks: ['NTT Docomo', 'SoftBank', 'KDDI'], coordinates: [138.2529, 36.2048], startingPrice: 4.99 },
+  { code: 'KR', name: 'South Korea', region: 'Asia', networks: ['SK Telecom', 'KT', 'LG U+'], coordinates: [127.7669, 35.9078], startingPrice: 4.49 },
+  { code: 'TH', name: 'Thailand', region: 'Asia', networks: ['AIS', 'DTAC', 'TrueMove'], coordinates: [100.9925, 15.8700], startingPrice: 3.99 },
+  { code: 'SG', name: 'Singapore', region: 'Asia', networks: ['Singtel', 'StarHub', 'M1'], coordinates: [103.8198, 1.3521], startingPrice: 4.99 },
+  { code: 'MY', name: 'Malaysia', region: 'Asia', networks: ['Maxis', 'Celcom', 'Digi'], coordinates: [101.9758, 4.2105], startingPrice: 3.99 },
+  { code: 'ID', name: 'Indonesia', region: 'Asia', networks: ['Telkomsel', 'XL', 'Indosat'], coordinates: [113.9213, -0.7893], startingPrice: 4.49 },
+  { code: 'VN', name: 'Vietnam', region: 'Asia', networks: ['Viettel', 'Mobifone', 'Vinaphone'], coordinates: [108.2772, 14.0583], startingPrice: 3.49 },
+  { code: 'PH', name: 'Philippines', region: 'Asia', networks: ['Globe', 'Smart', 'DITO'], coordinates: [121.7740, 12.8797], startingPrice: 4.49 },
+  { code: 'TW', name: 'Taiwan', region: 'Asia', networks: ['Chunghwa', 'Taiwan Mobile', 'FarEasTone'], coordinates: [120.9605, 23.6978], startingPrice: 4.99 },
+  { code: 'HK', name: 'Hong Kong', region: 'Asia', networks: ['3 HK', 'CSL', 'SmarTone'], coordinates: [114.1694, 22.3193], startingPrice: 3.99 },
+  { code: 'CN', name: 'China', region: 'Asia', networks: ['China Mobile', 'China Unicom', 'China Telecom'], coordinates: [104.1954, 35.8617], startingPrice: 5.99 },
+  { code: 'IN', name: 'India', region: 'Asia', networks: ['Jio', 'Airtel', 'Vi'], coordinates: [78.9629, 20.5937], startingPrice: 3.99 },
+  { code: 'US', name: 'United States', region: 'Americas', networks: ['AT&T', 'T-Mobile', 'Verizon'], coordinates: [-95.7129, 37.0902], startingPrice: 4.99 },
+  { code: 'CA', name: 'Canada', region: 'Americas', networks: ['Rogers', 'Bell', 'Telus'], coordinates: [-106.3468, 56.1304], startingPrice: 5.99 },
+  { code: 'MX', name: 'Mexico', region: 'Americas', networks: ['Telcel', 'AT&T', 'Movistar'], coordinates: [-102.5528, 23.6345], startingPrice: 4.49 },
+  { code: 'BR', name: 'Brazil', region: 'Americas', networks: ['Vivo', 'Claro', 'TIM'], coordinates: [-51.9253, -14.2350], startingPrice: 5.49 },
+  { code: 'AR', name: 'Argentina', region: 'Americas', networks: ['Claro', 'Movistar', 'Personal'], coordinates: [-63.6167, -38.4161], startingPrice: 5.99 },
+  { code: 'GB', name: 'United Kingdom', region: 'Europe', networks: ['EE', 'Vodafone', 'Three'], coordinates: [-3.4360, 55.3781], startingPrice: 4.49 },
+  { code: 'FR', name: 'France', region: 'Europe', networks: ['Orange', 'SFR', 'Bouygues'], coordinates: [2.2137, 46.2276], startingPrice: 4.49 },
+  { code: 'DE', name: 'Germany', region: 'Europe', networks: ['Telekom', 'Vodafone', 'O2'], coordinates: [10.4515, 51.1657], startingPrice: 4.49 },
+  { code: 'IT', name: 'Italy', region: 'Europe', networks: ['TIM', 'Vodafone', 'WindTre'], coordinates: [12.5674, 41.8719], startingPrice: 4.49 },
+  { code: 'ES', name: 'Spain', region: 'Europe', networks: ['Movistar', 'Vodafone', 'Orange'], coordinates: [-3.7492, 40.4637], startingPrice: 4.49 },
+  { code: 'NL', name: 'Netherlands', region: 'Europe', networks: ['KPN', 'Vodafone', 'T-Mobile'], coordinates: [5.2913, 52.1326], startingPrice: 4.99 },
+  { code: 'PT', name: 'Portugal', region: 'Europe', networks: ['MEO', 'NOS', 'Vodafone'], coordinates: [-8.2245, 39.3999], startingPrice: 4.49 },
+  { code: 'CH', name: 'Switzerland', region: 'Europe', networks: ['Swisscom', 'Sunrise', 'Salt'], coordinates: [8.2275, 46.8182], startingPrice: 5.99 },
+  { code: 'AT', name: 'Austria', region: 'Europe', networks: ['A1', 'Magenta', 'Drei'], coordinates: [14.5501, 47.5162], startingPrice: 4.99 },
+  { code: 'BE', name: 'Belgium', region: 'Europe', networks: ['Proximus', 'Orange', 'Base'], coordinates: [4.4699, 50.5039], startingPrice: 4.99 },
+  { code: 'SE', name: 'Sweden', region: 'Europe', networks: ['Telia', 'Tele2', 'Tre'], coordinates: [18.6435, 60.1282], startingPrice: 5.49 },
+  { code: 'NO', name: 'Norway', region: 'Europe', networks: ['Telenor', 'Telia', 'Ice'], coordinates: [8.4689, 60.4720], startingPrice: 5.99 },
+  { code: 'DK', name: 'Denmark', region: 'Europe', networks: ['TDC', 'Telenor', 'Telia'], coordinates: [9.5018, 56.2639], startingPrice: 5.49 },
+  { code: 'FI', name: 'Finland', region: 'Europe', networks: ['Elisa', 'DNA', 'Telia'], coordinates: [25.7482, 61.9241], startingPrice: 5.49 },
+  { code: 'IE', name: 'Ireland', region: 'Europe', networks: ['Vodafone', 'Three', 'Eir'], coordinates: [-8.2439, 53.4129], startingPrice: 4.99 },
+  { code: 'PL', name: 'Poland', region: 'Europe', networks: ['Orange', 'T-Mobile', 'Plus'], coordinates: [19.1451, 51.9194], startingPrice: 3.99 },
+  { code: 'CZ', name: 'Czech Republic', region: 'Europe', networks: ['O2', 'T-Mobile', 'Vodafone'], coordinates: [15.4730, 49.8175], startingPrice: 4.49 },
+  { code: 'GR', name: 'Greece', region: 'Europe', networks: ['Cosmote', 'Vodafone', 'Wind'], coordinates: [21.8243, 39.0742], startingPrice: 4.49 },
+  { code: 'AU', name: 'Australia', region: 'Oceania', networks: ['Telstra', 'Optus', 'Vodafone'], coordinates: [133.7751, -25.2744], startingPrice: 5.99 },
+  { code: 'NZ', name: 'New Zealand', region: 'Oceania', networks: ['Spark', 'Vodafone', '2degrees'], coordinates: [174.8860, -40.9006], startingPrice: 5.99 },
+  { code: 'AE', name: 'UAE', region: 'Middle East', networks: ['Etisalat', 'Du'], coordinates: [53.8478, 23.4241], startingPrice: 5.99 },
+  { code: 'TR', name: 'Turkey', region: 'Middle East', networks: ['Turkcell', 'Vodafone', 'Türk Telekom'], coordinates: [35.2433, 38.9637], startingPrice: 4.49 },
+  { code: 'IL', name: 'Israel', region: 'Middle East', networks: ['Pelephone', 'Cellcom', 'Partner'], coordinates: [34.8516, 31.0461], startingPrice: 5.49 },
+  { code: 'SA', name: 'Saudi Arabia', region: 'Middle East', networks: ['STC', 'Mobily', 'Zain'], coordinates: [45.0792, 23.8859], startingPrice: 5.99 },
+  { code: 'ZA', name: 'South Africa', region: 'Africa', networks: ['Vodacom', 'MTN', 'Cell C'], coordinates: [22.9375, -30.5595], startingPrice: 5.49 },
+  { code: 'EG', name: 'Egypt', region: 'Africa', networks: ['Vodafone', 'Orange', 'Etisalat'], coordinates: [30.8025, 26.8206], startingPrice: 4.99 },
+  { code: 'MA', name: 'Morocco', region: 'Africa', networks: ['Maroc Telecom', 'Orange', 'Inwi'], coordinates: [-7.0926, 31.7917], startingPrice: 4.99 },
 ]
 
 const regions = ['All', 'Asia', 'Europe', 'Americas', 'Oceania', 'Middle East', 'Africa']
@@ -97,33 +97,85 @@ export default function CoveragePage() {
         'star-intensity': 0.0
       })
 
-      // Add markers for covered countries
+      // Add markers for covered countries with popups
       coveredCountries.forEach(country => {
         const el = document.createElement('div')
         el.className = 'coverage-marker'
         el.style.cssText = `
-          width: 12px;
-          height: 12px;
+          width: 14px;
+          height: 14px;
           background: linear-gradient(135deg, #6366f1, #8b5cf6);
           border-radius: 50%;
           border: 2px solid white;
           box-shadow: 0 2px 8px rgba(99, 102, 241, 0.4);
           cursor: pointer;
-          transition: transform 0.2s;
         `
-        el.addEventListener('mouseenter', () => {
-          el.style.transform = 'scale(1.5)'
-        })
-        el.addEventListener('mouseleave', () => {
-          el.style.transform = 'scale(1)'
-        })
-        el.addEventListener('click', () => {
-          setSelectedCountry(country)
-        })
+
+        // Create flag emoji
+        const flag = String.fromCodePoint(...[...country.code].map(c => 0x1F1E6 - 65 + c.charCodeAt(0)))
+
+        // Create popup with pricing and CTA
+        const popupContent = `
+          <div style="padding: 8px; min-width: 180px; font-family: system-ui, -apple-system, sans-serif;">
+            <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 8px;">
+              <span style="font-size: 24px;">${flag}</span>
+              <div>
+                <div style="font-weight: 600; color: #111827; font-size: 14px;">${country.name}</div>
+                <div style="font-size: 12px; color: #6b7280;">${country.region}</div>
+              </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #6366f1, #8b5cf6); color: white; padding: 8px 12px; border-radius: 8px; margin-bottom: 8px;">
+              <div style="font-size: 11px; opacity: 0.9;">Starting from</div>
+              <div style="font-size: 20px; font-weight: 700;">$${country.startingPrice.toFixed(2)}</div>
+            </div>
+            <a href="/destinations/${country.code.toLowerCase()}"
+               style="display: block; text-align: center; background: #6366f1; color: white; padding: 8px 16px; border-radius: 8px; text-decoration: none; font-weight: 500; font-size: 13px; transition: background 0.2s;"
+               onmouseover="this.style.background='#4f46e5'"
+               onmouseout="this.style.background='#6366f1'">
+              View Plans →
+            </a>
+          </div>
+        `
+
+        const popup = new mapboxgl.Popup({
+          offset: 15,
+          closeButton: false,
+          closeOnClick: false,
+          className: 'coverage-popup'
+        }).setHTML(popupContent)
 
         new mapboxgl.Marker(el)
           .setLngLat(country.coordinates as [number, number])
           .addTo(map.current!)
+
+        // Show popup on hover
+        el.addEventListener('mouseenter', () => {
+          popup.setLngLat(country.coordinates as [number, number]).addTo(map.current!)
+        })
+
+        el.addEventListener('mouseleave', (e) => {
+          // Check if mouse is moving to popup
+          const relatedTarget = e.relatedTarget as HTMLElement
+          if (relatedTarget && relatedTarget.closest('.mapboxgl-popup')) {
+            return
+          }
+          setTimeout(() => {
+            const popupEl = document.querySelector('.mapboxgl-popup')
+            if (popupEl && !popupEl.matches(':hover')) {
+              popup.remove()
+            }
+          }, 100)
+        })
+
+        // Keep popup open when hovering over it
+        popup.getElement()?.addEventListener('mouseleave', () => {
+          popup.remove()
+        })
+
+        // Click to select country and show details below
+        el.addEventListener('click', () => {
+          setSelectedCountry(country)
+        })
       })
     })
 
