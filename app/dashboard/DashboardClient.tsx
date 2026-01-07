@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
+import Image from 'next/image'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Navbar } from '@/components/shared/Navbar'
 import { Footer } from '@/components/shared/Footer'
 import {
@@ -17,11 +18,15 @@ import {
   Signal,
   Calendar,
   CreditCard,
+  X,
+  Copy,
+  Check,
 } from 'lucide-react'
 
 interface ESim {
   id: string
   country: string
+  countryCode: string
   flag: string
   plan: string
   status: 'active' | 'pending' | 'expired'
@@ -30,6 +35,7 @@ interface ESim {
   daysLeft: number
   activatedAt: string | null
   qrCode: string | null
+  activationCode: string | null
 }
 
 interface Order {
@@ -58,6 +64,14 @@ interface DashboardClientProps {
 
 export function DashboardClient({ user, esims, orders, stats }: DashboardClientProps) {
   const [activeTab, setActiveTab] = useState<'esims' | 'orders'>('esims')
+  const [selectedEsim, setSelectedEsim] = useState<ESim | null>(null)
+  const [copied, setCopied] = useState(false)
+
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text)
+    setCopied(true)
+    setTimeout(() => setCopied(false), 2000)
+  }
 
   return (
     <>
@@ -246,8 +260,11 @@ export function DashboardClient({ user, esims, orders, stats }: DashboardClientP
                         )}
 
                         <div className="flex items-center gap-2">
-                          {esim.status === 'pending' && (
-                            <button className="btn btn-primary text-sm py-2">
+                          {(esim.status === 'pending' || esim.status === 'active') && esim.qrCode && (
+                            <button
+                              onClick={() => setSelectedEsim(esim)}
+                              className="btn btn-primary text-sm py-2"
+                            >
                               <QrCode className="w-4 h-4" />
                               View QR Code
                             </button>
@@ -399,6 +416,123 @@ export function DashboardClient({ user, esims, orders, stats }: DashboardClientP
       </main>
 
       <Footer />
+
+      {/* QR Code Modal */}
+      <AnimatePresence>
+        {selectedEsim && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
+            onClick={() => setSelectedEsim(null)}
+          >
+            <motion.div
+              initial={{ scale: 0.95, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              exit={{ scale: 0.95, opacity: 0 }}
+              onClick={(e) => e.stopPropagation()}
+              className="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl"
+            >
+              {/* Header */}
+              <div className="flex items-center justify-between mb-6">
+                <div className="flex items-center gap-3">
+                  <span className="text-3xl">{selectedEsim.flag}</span>
+                  <div>
+                    <h3 className="text-lg font-bold text-gray-900">{selectedEsim.country}</h3>
+                    <p className="text-sm text-gray-500">{selectedEsim.plan}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setSelectedEsim(null)}
+                  className="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+                >
+                  <X className="w-5 h-5 text-gray-400" />
+                </button>
+              </div>
+
+              {/* QR Code */}
+              <div className="bg-gray-50 rounded-xl p-6 mb-6">
+                <div className="flex flex-col items-center">
+                  {selectedEsim.qrCode && (
+                    <>
+                      {selectedEsim.qrCode.startsWith('http') ? (
+                        // Real QR code URL from eSIM API
+                        <Image
+                          src={selectedEsim.qrCode}
+                          alt="eSIM QR Code"
+                          width={200}
+                          height={200}
+                          className="rounded-lg"
+                        />
+                      ) : (
+                        // Base64 encoded QR code or activation code
+                        <div className="w-48 h-48 bg-white rounded-lg flex items-center justify-center border border-gray-200">
+                          <QrCode className="w-24 h-24 text-gray-300" />
+                        </div>
+                      )}
+                      <p className="text-sm text-gray-500 mt-4 text-center">
+                        Scan this QR code with your phone's camera to install the eSIM
+                      </p>
+                    </>
+                  )}
+                </div>
+              </div>
+
+              {/* Activation Code */}
+              {selectedEsim.activationCode && (
+                <div className="mb-6">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Manual Activation Code
+                  </label>
+                  <div className="flex items-center gap-2">
+                    <code className="flex-1 bg-gray-100 px-4 py-3 rounded-lg text-sm font-mono text-gray-800 break-all">
+                      {selectedEsim.activationCode}
+                    </code>
+                    <button
+                      onClick={() => copyToClipboard(selectedEsim.activationCode!)}
+                      className="p-3 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors"
+                    >
+                      {copied ? (
+                        <Check className="w-5 h-5 text-green-600" />
+                      ) : (
+                        <Copy className="w-5 h-5 text-indigo-600" />
+                      )}
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Instructions */}
+              <div className="space-y-3 text-sm text-gray-600">
+                <h4 className="font-semibold text-gray-900">Installation Instructions:</h4>
+                <ol className="list-decimal list-inside space-y-2">
+                  <li>Go to Settings → Cellular/Mobile Data</li>
+                  <li>Tap "Add eSIM" or "Add Cellular Plan"</li>
+                  <li>Scan the QR code or enter the activation code manually</li>
+                  <li>Wait for the eSIM to be activated (usually instant)</li>
+                </ol>
+              </div>
+
+              {/* Actions */}
+              <div className="mt-6 flex gap-3">
+                <button
+                  onClick={() => setSelectedEsim(null)}
+                  className="flex-1 btn btn-outline"
+                >
+                  Close
+                </button>
+                <Link
+                  href="/help/install-esim"
+                  className="flex-1 btn btn-primary text-center"
+                >
+                  Installation Guide
+                </Link>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </>
   )
 }

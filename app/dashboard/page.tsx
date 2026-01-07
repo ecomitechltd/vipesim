@@ -53,6 +53,7 @@ export default async function DashboardPage() {
         return {
           id: e.id,
           country: e.countryName,
+          countryCode: e.country,
           flag: getCountryFlag(e.countryName),
           plan: e.planName,
           status: mapStatus(e.status),
@@ -61,6 +62,7 @@ export default async function DashboardPage() {
           daysLeft: calculateDaysLeft(e.expiresAt),
           activatedAt: e.activatedAt?.toISOString() || null,
           qrCode: e.qrCode,
+          activationCode: e.activationCode,
         }
       })}
       orders={orders.map(o => ({
