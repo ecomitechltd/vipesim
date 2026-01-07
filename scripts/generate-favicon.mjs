@@ -6,20 +6,18 @@ import { fileURLToPath } from 'url';
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const publicDir = join(__dirname, '..', 'public');
 
-// SVG favicon design matching the logo
+// Clean, minimal favicon - white paper plane on purple
 const faviconSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366f1"/>
-      <stop offset="50%" style="stop-color:#a855f7"/>
-      <stop offset="100%" style="stop-color:#6366f1"/>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6366f1"/>
     </linearGradient>
   </defs>
-  <rect width="512" height="512" rx="96" fill="url(#bg-gradient)"/>
-  <g transform="translate(96, 96) scale(1.2)">
-    <path d="M247.15 23.95c-23.63-23.63-64.1-21.94-90.84 4.82L118 76.82 77.82 36.64C70.87 29.69 59.27 29.69 52.32 36.64C45.36 43.6 45.36 55.2 52.32 62.14L85.68 95.5 30.18 151c-1.01 1.01-1.01 2.65 0 3.66l-8.84 26.52c-2.69 8.06 2.02 16.79 10.4 18.43L71.26 207l7.03 7.03-28.04 28.04c-6.96 6.96-6.96 18.56 0 25.52 3.48 3.48 8.04 5.22 12.6 5.22s9.12-1.74 12.6-5.22l28.04-28.04 7.03 7.03 7.39 39.52c1.64 8.38 10.37 13.09 18.43 10.4l26.52-8.84c1.01 1.01 2.65 1.01 3.66 0l55.5-55.5 33.36 33.36c3.48 3.48 8.04 5.22 12.6 5.22s9.12-1.74 12.6-5.22c6.96-6.96 6.96-18.56 0-25.52l-40.18-40.18 48.05-48.05c26.76-26.76 28.45-67.21 4.82-90.84z" fill="white"/>
-  </g>
-  <circle cx="432" cy="80" r="56" fill="#4ade80"/>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <!-- Paper plane / send icon -->
+  <path d="M112 256 L400 112 L256 400 L224 288 L112 256 Z" fill="white"/>
+  <path d="M224 288 L400 112" stroke="rgba(139,92,246,0.3)" stroke-width="16" stroke-linecap="round"/>
 </svg>`;
 
 async function generateFavicons() {

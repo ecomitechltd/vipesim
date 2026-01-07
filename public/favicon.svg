@@ -1,14 +1,11 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
   <defs>
-    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366f1"/>
-      <stop offset="50%" style="stop-color:#a855f7"/>
-      <stop offset="100%" style="stop-color:#6366f1"/>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#8b5cf6"/>
+      <stop offset="100%" stop-color="#6366f1"/>
     </linearGradient>
   </defs>
-  <rect width="32" height="32" rx="8" fill="url(#bg-gradient)"/>
-  <g transform="translate(6, 6)">
-    <path d="M18.5 1.5c-1.4-1.4-3.8-1.3-5.4.3L10.7 4.2 8.3 1.8c-.4-.4-1-.4-1.4 0s-.4 1 0 1.4l2 2-3.3 3.3-4.2-1.4c-.4-.1-.9 0-1.2.3-.3.3-.4.8-.3 1.2l1.4 4.2-1.8 1.8c-.4.4-.4 1 0 1.4.2.2.4.3.7.3s.5-.1.7-.3l1.8-1.8 4.2 1.4c.1 0 .3.1.4.1.3 0 .6-.1.8-.4.3-.3.4-.8.3-1.2l-1.4-4.2 3.3-3.3 2 2c.2.2.4.3.7.3s.5-.1.7-.3c.4-.4.4-1 0-1.4l-2.4-2.4 2.4-2.4c1.6-1.6 1.7-4 .3-5.4z" fill="white"/>
-  </g>
-  <circle cx="26" cy="6" r="4" fill="#4ade80"/>
+  <rect width="512" height="512" rx="108" fill="url(#bg)"/>
+  <path d="M112 256 L400 112 L256 400 L224 288 L112 256 Z" fill="white"/>
+  <path d="M224 288 L400 112" stroke="rgba(139,92,246,0.3)" stroke-width="16" stroke-linecap="round"/>
 </svg>
