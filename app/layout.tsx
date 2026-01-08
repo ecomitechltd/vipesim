@@ -1,11 +1,11 @@
 import type { Metadata, Viewport } from "next"
-import { Open_Sans } from "next/font/google"
+import { DM_Sans } from "next/font/google"
 import { SessionProvider } from "next-auth/react"
 import "./globals.css"
 
-const openSans = Open_Sans({
+const dmSans = DM_Sans({
   subsets: ["latin"],
-  variable: "--font-open-sans",
+  variable: "--font-dm-sans",
   weight: ["300", "400", "500", "600", "700", "800"],
 })
 
@@ -36,7 +36,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${openSans.variable} font-sans antialiased`}>
+      <body className={`${dmSans.variable} font-sans antialiased`}>
         <SessionProvider>
           {children}
         </SessionProvider>
