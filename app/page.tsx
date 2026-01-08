@@ -701,8 +701,8 @@ export default function HomePage() {
                   Get Started
                   <ArrowRight weight="bold" className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Link>
-                <Link href="/pricing" className="btn border-2 border-white/30 text-white hover:bg-white/10 text-base px-8 py-4">
-                  View Pricing
+                <Link href="/destinations" className="btn border-2 border-white/30 text-white hover:bg-white/10 text-base px-8 py-4">
+                  View Plans
                 </Link>
               </div>
             </motion.div>

@@ -45,8 +45,8 @@ export function Navbar() {
           <div className="hidden md:flex items-center gap-1">
             {[
               { href: '/destinations', label: 'Destinations' },
-              { href: '/pricing', label: 'Pricing' },
-              { href: '/support', label: 'Support' },
+              { href: '/coverage', label: 'Coverage' },
+              { href: '/help', label: 'Help' },
             ].map((item) => (
               <Link
                 key={item.href}
@@ -137,8 +137,8 @@ export function Navbar() {
             <div className="container mx-auto px-6 py-6 space-y-2">
               {[
                 { href: '/destinations', label: 'Destinations' },
-                { href: '/pricing', label: 'Pricing' },
-                { href: '/support', label: 'Support' },
+                { href: '/coverage', label: 'Coverage' },
+                { href: '/help', label: 'Help' },
               ].map((item) => (
                 <Link
                   key={item.href}

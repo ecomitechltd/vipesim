@@ -46,8 +46,7 @@ export function Footer() {
             <ul className="space-y-2">
               <li><Link href="/destinations" className="text-gray-500 hover:text-indigo-600 text-sm">Destinations</Link></li>
               <li><Link href="/coverage" className="text-gray-500 hover:text-indigo-600 text-sm">Coverage Map</Link></li>
-              <li><Link href="/how-it-works" className="text-gray-500 hover:text-indigo-600 text-sm">How It Works</Link></li>
-              <li><Link href="/compatibility" className="text-gray-500 hover:text-indigo-600 text-sm">Compatibility</Link></li>
+              <li><Link href="/help/install-esim" className="text-gray-500 hover:text-indigo-600 text-sm">How It Works</Link></li>
             </ul>
           </div>
 
@@ -55,8 +54,7 @@ export function Footer() {
             <h4 className="font-semibold text-gray-900 mb-4">Support</h4>
             <ul className="space-y-2">
               <li><Link href="/help" className="text-gray-500 hover:text-indigo-600 text-sm">Help Center</Link></li>
-              <li><Link href="/contact" className="text-gray-500 hover:text-indigo-600 text-sm">Contact Us</Link></li>
-              <li><Link href="/faq" className="text-gray-500 hover:text-indigo-600 text-sm">FAQs</Link></li>
+              <li><a href="mailto:support@esimfly.com" className="text-gray-500 hover:text-indigo-600 text-sm">Contact Us</a></li>
             </ul>
           </div>
 

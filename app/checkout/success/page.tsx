@@ -112,7 +112,7 @@ function SuccessContent() {
                 Go to Dashboard
                 <ArrowRight className="w-4 h-4" />
               </Link>
-              <Link href="/support" className="btn btn-secondary">
+              <Link href="/help" className="btn btn-secondary">
                 <HelpCircle className="w-4 h-4" />
                 Need Help?
               </Link>
