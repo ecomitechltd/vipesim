@@ -231,24 +231,24 @@ export default function CoveragePage() {
               animate={{ opacity: 1, y: 0 }}
               className="max-w-3xl"
             >
-              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6">
+              <div className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2 mb-6 text-white">
                 <Globe className="w-4 h-4" />
                 <span className="text-sm font-medium">Global Coverage</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
                 Stay Connected in 190+ Countries
               </h1>
               <p className="text-xl text-indigo-100 mb-8">
                 Our eSIM network partners provide reliable 4G/5G coverage worldwide.
                 Check our coverage map to see available networks in your destination.
               </p>
-              <div className="flex flex-wrap gap-6">
+              <div className="flex flex-wrap gap-6 text-white">
                 <div className="flex items-center gap-2">
                   <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center">
                     <Signal className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-semibold">4G/5G Networks</p>
+                    <p className="font-semibold text-white">4G/5G Networks</p>
                     <p className="text-sm text-indigo-200">High-speed data</p>
                   </div>
                 </div>
@@ -257,7 +257,7 @@ export default function CoveragePage() {
                     <Wifi className="w-5 h-5" />
                   </div>
                   <div>
-                    <p className="font-semibold">500+ Carriers</p>
+                    <p className="font-semibold text-white">500+ Carriers</p>
                     <p className="text-sm text-indigo-200">Partner networks</p>
                   </div>
                 </div>
@@ -447,7 +447,7 @@ export default function CoveragePage() {
         <section className="py-16">
           <div className="container mx-auto px-6">
             <div className="bg-gradient-to-br from-indigo-600 to-purple-600 rounded-3xl p-12 text-center text-white">
-              <h2 className="text-3xl font-bold mb-4">Ready to Stay Connected?</h2>
+              <h2 className="text-3xl font-bold mb-4 text-white">Ready to Stay Connected?</h2>
               <p className="text-indigo-100 mb-8 max-w-xl mx-auto">
                 Get your eSIM in minutes and enjoy seamless connectivity in 190+ countries worldwide.
               </p>

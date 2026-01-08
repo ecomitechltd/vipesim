@@ -472,7 +472,7 @@ export function DashboardClient({ user, esims, orders, stats }: DashboardClientP
                         </div>
                       )}
                       <p className="text-sm text-gray-500 mt-4 text-center">
-                        Scan this QR code with your phone's camera to install the eSIM
+                        Scan this QR code with your phone&apos;s camera to install the eSIM
                       </p>
                     </>
                   )}
@@ -508,7 +508,7 @@ export function DashboardClient({ user, esims, orders, stats }: DashboardClientP
                 <h4 className="font-semibold text-gray-900">Installation Instructions:</h4>
                 <ol className="list-decimal list-inside space-y-2">
                   <li>Go to Settings → Cellular/Mobile Data</li>
-                  <li>Tap "Add eSIM" or "Add Cellular Plan"</li>
+                  <li>Tap &quot;Add eSIM&quot; or &quot;Add Cellular Plan&quot;</li>
                   <li>Scan the QR code or enter the activation code manually</li>
                   <li>Wait for the eSIM to be activated (usually instant)</li>
                 </ol>

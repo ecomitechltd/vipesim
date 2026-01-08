@@ -59,6 +59,11 @@ h1, h2, h3 {
   letter-spacing: 0.02em;
 }
 
+/* Override for white text on dark backgrounds */
+h1.text-white, h2.text-white, h3.text-white {
+  color: white;
+}
+
 h4, h5, h6 {
   font-weight: 700;
   line-height: 1.2;

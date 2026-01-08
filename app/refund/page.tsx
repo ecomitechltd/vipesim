@@ -123,7 +123,7 @@ export default function RefundPage() {
                   <li>Log in to your eSIMFly account</li>
                   <li>Navigate to your Order History</li>
                   <li>Select the order you wish to refund</li>
-                  <li>Click "Request Refund" and provide the reason</li>
+                  <li>Click &quot;Request Refund&quot; and provide the reason</li>
                 </ol>
                 <p>Alternatively, you can email us at support@esimfly.com with:</p>
                 <ul>
@@ -165,7 +165,7 @@ export default function RefundPage() {
 
                 <h2>8. Changes to This Policy</h2>
                 <p>
-                  We reserve the right to modify this Refund Policy at any time. Changes will be posted on this page with an updated "Last updated" date. Continued use of our services after changes constitutes acceptance of the modified policy.
+                  We reserve the right to modify this Refund Policy at any time. Changes will be posted on this page with an updated &quot;Last updated&quot; date. Continued use of our services after changes constitutes acceptance of the modified policy.
                 </p>
 
                 <h2>9. Contact Us</h2>

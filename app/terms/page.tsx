@@ -33,10 +33,10 @@ export default function TermsPage() {
               <div className="prose prose-gray max-w-none">
                 <h2>1. Agreement to Terms</h2>
                 <p>
-                  By accessing or using the eSIMFly website and services (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you disagree with any part of these terms, you may not access the Service.
+                  By accessing or using the eSIMFly website and services (the &quot;Service&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you disagree with any part of these terms, you may not access the Service.
                 </p>
                 <p>
-                  These Terms apply to all visitors, users, and others who access or use the Service. The Service is operated by [Company Name], located at [Company Address] ("we," "us," or "our").
+                  These Terms apply to all visitors, users, and others who access or use the Service. The Service is operated by [Company Name], located at [Company Address] (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;).
                 </p>
 
                 <h2>2. Description of Service</h2>
@@ -127,12 +127,12 @@ export default function TermsPage() {
 
                 <h2>10. Disclaimer of Warranties</h2>
                 <p>
-                  The Service is provided "as is" and "as available" without warranties of any kind. We do not guarantee uninterrupted network coverage or specific data speeds, as these depend on local network conditions.
+                  The Service is provided &quot;as is&quot; and &quot;as available&quot; without warranties of any kind. We do not guarantee uninterrupted network coverage or specific data speeds, as these depend on local network conditions.
                 </p>
 
                 <h2>11. Changes to Terms</h2>
                 <p>
-                  We reserve the right to modify these Terms at any time. We will notify users of significant changes by posting the new Terms on this page and updating the "Last updated" date.
+                  We reserve the right to modify these Terms at any time. We will notify users of significant changes by posting the new Terms on this page and updating the &quot;Last updated&quot; date.
                 </p>
 
                 <h2>12. Governing Law</h2>

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getPackages, priceToUSD, bytesToGB, getCountryName, getCountryFlag, getRegion } from '@/lib/esim-api'
+import { getPackages, priceToUSD, bytesToGB, getCountryName, getCountryFlag } from '@/lib/esim-api'
 import { CountryClient } from './CountryClient'
 
 interface Props {

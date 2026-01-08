@@ -92,8 +92,8 @@ export function CountryClient({ country, otherDestinations }: CountryClientProps
               className="flex items-center gap-6"
             >
               <FlagIcon code={country.code} className="w-24 h-16 rounded-lg shadow-xl" />
-              <div className="text-white">
-                <h1 className="text-4xl lg:text-5xl font-bold mb-2">
+              <div>
+                <h1 className="text-4xl lg:text-5xl font-bold mb-2 text-white">
                   {country.name} eSIM
                 </h1>
                 <p className="text-xl text-white/80">

@@ -9,7 +9,6 @@ import { Footer } from '@/components/shared/Footer'
 import {
   CheckCircle,
   Mail,
-  Download,
   Smartphone,
   ArrowRight,
   HelpCircle,
@@ -17,7 +16,8 @@ import {
 
 function SuccessContent() {
   const searchParams = useSearchParams()
-  const orderId = searchParams.get('order') || Date.now().toString()
+  const orderParam = searchParams.get('order')
+  const orderId = orderParam ?? 'unknown'
 
   return (
     <>

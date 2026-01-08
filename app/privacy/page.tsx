@@ -33,7 +33,7 @@ export default function PrivacyPage() {
               <div className="prose prose-gray max-w-none">
                 <h2>1. Introduction</h2>
                 <p>
-                  [Company Name] ("we," "us," or "our") operates the eSIMFly website and services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.
+                  [Company Name] (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) operates the eSIMFly website and services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.
                 </p>
                 <p>
                   We are committed to protecting your privacy and ensuring that your personal information is handled responsibly and in compliance with applicable data protection laws.
@@ -157,14 +157,14 @@ export default function PrivacyPage() {
                   Your information may be transferred to and processed in countries other than your own. We ensure appropriate safeguards are in place for such transfers in compliance with applicable laws.
                 </p>
 
-                <h2>10. Children's Privacy</h2>
+                <h2>10. Children&apos;s Privacy</h2>
                 <p>
                   Our Service is not directed to individuals under the age of 18. We do not knowingly collect personal information from children. If you believe we have collected information from a child, please contact us immediately.
                 </p>
 
                 <h2>11. Changes to This Policy</h2>
                 <p>
-                  We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the new policy on this page and updating the "Last updated" date.
+                  We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the new policy on this page and updating the &quot;Last updated&quot; date.
                 </p>
 
                 <h2>12. Contact Us</h2>

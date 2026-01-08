@@ -205,7 +205,7 @@ export default function InstallEsimPage() {
               <div className="bg-gray-100 rounded-2xl p-8 mb-12">
                 <h3 className="text-xl font-semibold text-gray-900 mb-4">Manual Installation</h3>
                 <p className="text-gray-600 mb-4">
-                  If you can't scan the QR code, you can enter the activation code manually:
+                  If you can&apos;t scan the QR code, you can enter the activation code manually:
                 </p>
                 <ol className="list-decimal list-inside space-y-2 text-gray-600">
                   <li>Go to Settings &gt; Cellular &gt; Add eSIM</li>
@@ -226,7 +226,7 @@ export default function InstallEsimPage() {
                       <li>• Keep Data Roaming enabled on the eSIM line</li>
                       <li>• Your data plan starts when you first connect in your destination</li>
                       <li>• You can keep your physical SIM for calls while using eSIM for data</li>
-                      <li>• Each QR code can only be used once - don't share it</li>
+                      <li>• Each QR code can only be used once - don&apos;t share it</li>
                     </ul>
                   </div>
                 </div>
@@ -241,7 +241,7 @@ export default function InstallEsimPage() {
             <div className="max-w-3xl mx-auto text-center">
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Still Having Trouble?</h2>
               <p className="text-gray-600 mb-8">
-                Our support team is here to help you get connected. Reach out and we'll assist you with installation.
+                Our support team is here to help you get connected. Reach out and we&apos;ll assist you with installation.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Link
