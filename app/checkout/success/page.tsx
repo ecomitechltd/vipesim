@@ -23,7 +23,7 @@ function SuccessContent() {
     <>
       <Navbar />
 
-      <main className="pt-16 min-h-screen bg-gray-50">
+      <main className="pt-20 min-h-screen bg-gray-50">
         <div className="container mx-auto px-6 py-16">
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}

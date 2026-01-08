@@ -75,7 +75,7 @@ export function DestinationsClient({ destinations, popularCountries }: Destinati
     <>
       <Navbar />
 
-      <main className="pt-16 min-h-screen bg-gray-50">
+      <main className="pt-20 min-h-screen bg-gray-50">
         {/* Header */}
         <section className="relative overflow-hidden bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700">
           <div className="absolute -top-20 -right-20 w-96 h-96 bg-white/5 rounded-full" />

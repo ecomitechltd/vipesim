@@ -77,7 +77,7 @@ export function DashboardClient({ user, esims, orders, stats }: DashboardClientP
     <>
       <Navbar />
 
-      <main className="pt-16 min-h-screen bg-gray-50">
+      <main className="pt-20 min-h-screen bg-gray-50">
         {/* Header with Stats */}
         <section className="bg-white border-b border-gray-100">
           <div className="container mx-auto px-6 py-8">

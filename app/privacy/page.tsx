@@ -12,9 +12,9 @@ export default function PrivacyPage() {
     <>
       <Navbar />
 
-      <main className="pt-16 min-h-screen bg-gray-50">
+      <main className="pt-20 min-h-screen bg-gray-50">
         {/* Hero */}
-        <section className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 text-white py-16">
+        <section className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 text-white py-20">
           <div className="container mx-auto px-6">
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">

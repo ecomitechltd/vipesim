@@ -183,7 +183,7 @@ function CheckoutContent() {
     return (
       <>
         <Navbar />
-        <div className="pt-16 min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="pt-20 min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <CircleNotch weight="bold" className="w-8 h-8 animate-spin text-indigo-600 mx-auto mb-4" />
             <p className="text-gray-500">Loading plan details...</p>
@@ -197,7 +197,7 @@ function CheckoutContent() {
     return (
       <>
         <Navbar />
-        <div className="pt-16 min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="pt-20 min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <h1 className="text-2xl font-bold text-gray-900 mb-4">
               {error || 'Plan not found'}
@@ -218,7 +218,7 @@ function CheckoutContent() {
     <>
       <Navbar />
 
-      <main className="pt-16 min-h-screen bg-gray-50">
+      <main className="pt-20 min-h-screen bg-gray-50">
         {/* Header */}
         <div className="bg-white border-b border-gray-100">
           <div className="container mx-auto px-6 py-4">

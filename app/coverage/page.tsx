@@ -221,7 +221,7 @@ export default function CoveragePage() {
     <>
       <Navbar />
 
-      <main className="pt-16 min-h-screen bg-gray-50">
+      <main className="pt-20 min-h-screen bg-gray-50">
         {/* Hero */}
         <section className="bg-gradient-to-br from-indigo-600 via-purple-600 to-indigo-700 text-white py-20 relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('/grid.svg')] opacity-10" />
