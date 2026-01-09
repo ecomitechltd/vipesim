@@ -12,9 +12,7 @@ import {
   Clock,
   Globe,
   ChevronRight,
-  Download,
   QrCode,
-  MoreVertical,
   Signal,
   Calendar,
   CreditCard,
@@ -355,9 +353,6 @@ export function DashboardClient({ user, esims, orders, stats }: DashboardClientP
                               Gifted to {esim.giftedToEmail}
                             </span>
                           )}
-                          <button className="p-2 rounded-lg hover:bg-gray-100 text-gray-400 hover:text-gray-600 transition-colors">
-                            <MoreVertical className="w-5 h-5" />
-                          </button>
                         </div>
                       </div>
                     </div>
@@ -365,18 +360,27 @@ export function DashboardClient({ user, esims, orders, stats }: DashboardClientP
                     {/* Quick Actions */}
                     {esim.status === 'active' && (
                       <div className="flex gap-3 mt-4 pt-4 border-t border-gray-100">
-                        <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition-colors">
+                        <Link
+                          href={`/destinations/${esim.countryCode.toLowerCase()}`}
+                          className="flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition-colors"
+                        >
                           <Signal className="w-4 h-4" />
                           Check Coverage
+                        </Link>
+                        <button
+                          onClick={() => setSelectedEsim(esim)}
+                          className="flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition-colors"
+                        >
+                          <QrCode className="w-4 h-4" />
+                          View Details
                         </button>
-                        <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition-colors">
-                          <Download className="w-4 h-4" />
-                          Download Details
-                        </button>
-                        <button className="flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition-colors">
+                        <Link
+                          href={`/destinations/${esim.countryCode.toLowerCase()}`}
+                          className="flex items-center gap-2 text-sm text-gray-500 hover:text-indigo-600 transition-colors"
+                        >
                           <Plus className="w-4 h-4" />
                           Top Up Data
-                        </button>
+                        </Link>
                       </div>
                     )}
                   </motion.div>
