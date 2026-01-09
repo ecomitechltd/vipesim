@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
+import { notifyWalletTopup } from '@/lib/telegram'
 
 const BASE_URL = process.env.NEXTAUTH_URL || 'https://esimfly.me'
 
@@ -56,6 +57,15 @@ export async function GET(request: NextRequest) {
     ])
 
     console.log(`Wallet top-up completed: User ${transaction.userId} added $${(transaction.amount / 100).toFixed(2)}, new balance: $${(newBalance / 100).toFixed(2)}`)
+
+    // Send Telegram notification (don't block redirect)
+    notifyWalletTopup({
+      email: transaction.user.email,
+      amount: transaction.amount,
+      newBalance,
+      method: 'G2Pay',
+      status: 'Completed',
+    }).catch((err) => console.error('Failed to send Telegram topup notification:', err))
 
     return NextResponse.redirect(`${BASE_URL}/dashboard?tab=wallet&success=topup&amount=${(transaction.amount / 100).toFixed(2)}`)
 

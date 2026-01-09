@@ -2,6 +2,7 @@ import NextAuth from 'next-auth'
 import Credentials from 'next-auth/providers/credentials'
 import bcrypt from 'bcryptjs'
 import { prisma } from './db'
+import { notifySignin } from './telegram'
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
   trustHost: true,
@@ -71,5 +72,15 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
   },
   pages: {
     signIn: '/login',
+  },
+  events: {
+    async signIn({ user }) {
+      // Send Telegram notification for successful login
+      notifySignin({
+        email: user.email || 'Unknown',
+        name: user.name,
+        method: 'Credentials',
+      }).catch((err) => console.error('Failed to send Telegram signin notification:', err))
+    },
   },
 })

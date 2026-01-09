@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server'
 import bcrypt from 'bcryptjs'
 import { prisma } from '@/lib/db'
 import { sendWelcomeEmail } from '@/lib/email'
+import { notifySignup } from '@/lib/telegram'
 
 export async function POST(request: Request) {
   try {
@@ -45,6 +46,13 @@ export async function POST(request: Request) {
       email,
       name: user.name || email.split('@')[0],
     }).catch((err) => console.error('Failed to send welcome email:', err))
+
+    // Send Telegram notification (don't block registration)
+    notifySignup({
+      email,
+      name: user.name,
+      source: 'Direct',
+    }).catch((err) => console.error('Failed to send Telegram notification:', err))
 
     return NextResponse.json({
       user: {

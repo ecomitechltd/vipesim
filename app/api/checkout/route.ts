@@ -3,6 +3,7 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 import { getPackages, priceToUSD, bytesToGB, getCountryName, orderProfiles, queryProfiles } from '@/lib/esim-api'
 import { sendPurchaseEmail } from '@/lib/email'
+import { notifyPurchase } from '@/lib/telegram'
 
 const BASE_URL = process.env.NEXTAUTH_URL || 'https://esimfly.me'
 
@@ -208,6 +209,18 @@ export async function POST(request: NextRequest) {
           qrCodeUrl: esimProfile.qrCodeUrl,
           activationCode: esimProfile.ac || undefined,
         }).catch((err) => console.error('Failed to send purchase email:', err))
+
+        // Send Telegram notification (don't block response)
+        notifyPurchase({
+          orderId: order.id,
+          email: session.user.email!,
+          country: countryName,
+          planName: `${dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`} / ${pkg.duration} days`,
+          dataAmount: dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`,
+          validity: pkg.duration,
+          total: totalPriceCents,
+          status: 'COMPLETED',
+        }).catch((err) => console.error('Failed to send Telegram purchase notification:', err))
 
         return NextResponse.json({
           success: true,
