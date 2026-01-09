@@ -1,8 +1,12 @@
 import crypto from 'crypto'
+import { unstable_cache } from 'next/cache'
 
 const API_BASE_URL = 'https://api.esimaccess.com/api/v1/open'
 const ACCESS_CODE = process.env.ESIM_ACCESS_CODE!
 const SECRET_KEY = process.env.ESIM_SECRET_KEY!
+
+// Cache duration in seconds (5 minutes for package data)
+const CACHE_DURATION = 300
 
 // Types based on eSIM Access API documentation
 export interface Package {
@@ -133,8 +137,8 @@ async function apiRequest<T>(endpoint: string, body: object = {}): Promise<T> {
   return data.obj
 }
 
-// Get all available data packages
-export async function getPackages(options?: {
+// Internal uncached package fetcher
+async function fetchPackages(options?: {
   locationCode?: string
   type?: 'BASE' | 'TOPUP'
   packageCode?: string
@@ -150,6 +154,32 @@ export async function getPackages(options?: {
     iccid: options?.iccid || '',
     dataType: options?.dataType || '',
   })
+}
+
+// Cached: Get all packages (no filter) - heavily cached for "other destinations" etc
+export const getAllPackagesCached = unstable_cache(
+  async () => fetchPackages(),
+  ['all-packages'],
+  { revalidate: CACHE_DURATION, tags: ['packages'] }
+)
+
+// Cached: Get packages by country code
+export const getPackagesByCountryCached = unstable_cache(
+  async (locationCode: string) => fetchPackages({ locationCode }),
+  ['packages-by-country'],
+  { revalidate: CACHE_DURATION, tags: ['packages'] }
+)
+
+// Get all available data packages (uncached - for checkout/orders)
+export async function getPackages(options?: {
+  locationCode?: string
+  type?: 'BASE' | 'TOPUP'
+  packageCode?: string
+  slug?: string
+  iccid?: string
+  dataType?: number
+}): Promise<{ packageList: Package[] }> {
+  return fetchPackages(options)
 }
 
 // Order eSIM profiles

@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getPackages, priceToUSD, bytesToGB, getCountryName, getCountryFlag } from '@/lib/esim-api'
+import { getPackagesByCountryCached, getAllPackagesCached, priceToUSD, bytesToGB, getCountryName, getCountryFlag } from '@/lib/esim-api'
 import { CountryClient } from './CountryClient'
 
 interface Props {
@@ -28,8 +28,8 @@ export default async function CountryDetailPage({ params }: Props) {
   const countryCode = country.toUpperCase()
 
   try {
-    // Fetch all packages for this country
-    const { packageList } = await getPackages({ locationCode: countryCode })
+    // Fetch packages for this country (cached for 5 minutes)
+    const { packageList } = await getPackagesByCountryCached(countryCode)
 
     // Filter packages that include this country
     const countryPackages = packageList.filter(pkg => {
@@ -79,8 +79,8 @@ export default async function CountryDetailPage({ params }: Props) {
       networks,
     }
 
-    // Fetch other popular destinations for recommendations
-    const { packageList: allPackages } = await getPackages()
+    // Fetch other popular destinations for recommendations (cached for 5 minutes)
+    const { packageList: allPackages } = await getAllPackagesCached()
 
     const otherDestinations: { code: string; name: string; flag: string; lowestPrice: number }[] = []
 
