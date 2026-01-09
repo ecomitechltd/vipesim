@@ -3,7 +3,8 @@ import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
 
 const G2PAY_API_URL = process.env.G2PAY_API_URL || 'https://engine.g2pay.io/api/v1'
-const G2PAY_API_KEY = process.env.G2PAY_API_KEY || 'fLWeMSP1UjG9mEPczY292Djm2fSzuvVKLRAQANDWmc2r'
+const G2PAY_API_KEY = process.env.G2PAY_API_KEY || 'mEPczY292Djm2fSzuvVKLRAQANDWmc2r'
+const G2PAY_SIGNING_KEY = process.env.G2PAY_SIGNING_KEY || 'fLWeMSP1UjG9'
 const BASE_URL = process.env.NEXTAUTH_URL || 'https://esimfly.me'
 const IS_DEV = process.env.NODE_ENV === 'development'
 
