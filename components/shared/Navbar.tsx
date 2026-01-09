@@ -5,6 +5,7 @@ import Link from 'next/link'
 import { useSession, signOut } from 'next-auth/react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { AirplaneTilt, List, X, User, SignOut, CaretDown, ArrowRight } from '@phosphor-icons/react'
+import { WalletBalance } from '@/components/wallet'
 
 export function Navbar() {
   const { data: session } = useSession()
@@ -61,7 +62,9 @@ export function Navbar() {
           {/* Auth Buttons */}
           <div className="hidden md:flex items-center gap-3">
             {session ? (
-              <div className="relative">
+              <>
+                <WalletBalance showTopupButton={true} />
+                <div className="relative">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center gap-3 px-4 py-2.5 rounded-xl hover:bg-gray-100 transition-all duration-200"
@@ -102,6 +105,7 @@ export function Navbar() {
                   )}
                 </AnimatePresence>
               </div>
+              </>
             ) : (
               <>
                 <Link href="/login" className="px-5 py-2.5 text-gray-600 hover:text-indigo-600 font-semibold text-sm uppercase tracking-wide transition-colors">

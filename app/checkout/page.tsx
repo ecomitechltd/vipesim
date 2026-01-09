@@ -2,21 +2,23 @@
 
 import { useState, useEffect, Suspense } from 'react'
 import { useSearchParams, useRouter } from 'next/navigation'
-import { useSession } from 'next-auth/react'
+import { useSession, signIn } from 'next-auth/react'
 import Link from 'next/link'
 import { motion } from 'framer-motion'
 import { Navbar } from '@/components/shared/Navbar'
 import { FlagIcon } from '@/components/shared/FlagIcon'
+import { WalletTopupModal } from '@/components/wallet'
 import {
   ArrowLeft,
-  CreditCard,
-  Envelope,
+  Wallet,
   Lock,
   Check,
   ShieldCheck,
   Lightning,
-  CaretRight,
   CircleNotch,
+  WarningCircle,
+  Plus,
+  SignIn,
 } from '@phosphor-icons/react'
 
 interface PlanData {
@@ -42,26 +44,40 @@ function CheckoutContent() {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
-  const [email, setEmail] = useState('')
-  const [cardNumber, setCardNumber] = useState('')
-  const [expiry, setExpiry] = useState('')
-  const [cvc, setCvc] = useState('')
-  const [name, setName] = useState('')
+  const [walletBalance, setWalletBalance] = useState<number>(0)
+  const [walletLoading, setWalletLoading] = useState(true)
   const [promoCode, setPromoCode] = useState('')
   const [promoApplied, setPromoApplied] = useState(false)
   const [promoDiscount, setPromoDiscount] = useState(0)
   const [promoError, setPromoError] = useState<string | null>(null)
   const [isProcessing, setIsProcessing] = useState(false)
-  const [step, setStep] = useState(1)
   const [orderError, setOrderError] = useState<string | null>(null)
+  const [showTopupModal, setShowTopupModal] = useState(false)
+  const [requiredAmount, setRequiredAmount] = useState(0)
 
-  // If user is logged in, skip email step and use their account email
+  // Fetch wallet balance
   useEffect(() => {
-    if (sessionStatus === 'authenticated' && session?.user?.email) {
-      setEmail(session.user.email)
-      setStep(2) // Skip to payment
+    async function fetchWalletBalance() {
+      if (sessionStatus !== 'authenticated') {
+        setWalletLoading(false)
+        return
+      }
+
+      try {
+        const response = await fetch('/api/wallet')
+        if (response.ok) {
+          const data = await response.json()
+          setWalletBalance(data.balance)
+        }
+      } catch (error) {
+        console.error('Failed to fetch wallet balance:', error)
+      } finally {
+        setWalletLoading(false)
+      }
     }
-  }, [session, sessionStatus])
+
+    fetchWalletBalance()
+  }, [sessionStatus])
 
   // Fetch plan data from API
   useEffect(() => {
@@ -90,29 +106,10 @@ function CheckoutContent() {
     fetchPlan()
   }, [planSlug])
 
-  // Format card number with spaces
-  const formatCardNumber = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
-    const matches = v.match(/\d{4,16}/g)
-    const match = (matches && matches[0]) || ''
-    const parts = []
-    for (let i = 0, len = match.length; i < len; i += 4) {
-      parts.push(match.substring(i, i + 4))
-    }
-    return parts.length ? parts.join(' ') : value
-  }
-
-  // Format expiry date
-  const formatExpiry = (value: string) => {
-    const v = value.replace(/\s+/g, '').replace(/[^0-9]/gi, '')
-    if (v.length >= 2) {
-      return v.substring(0, 2) + '/' + v.substring(2, 4)
-    }
-    return v
-  }
-
   const discount = promoApplied ? (plan?.price || 0) * (promoDiscount / 100) : 0
   const total = (plan?.price || 0) - discount
+  const totalCents = Math.round(total * 100)
+  const hasEnoughBalance = walletBalance >= totalCents
 
   const handleApplyPromo = async () => {
     if (!promoCode) return
@@ -144,33 +141,38 @@ function CheckoutContent() {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handlePurchase = async () => {
     if (!plan) return
 
     setIsProcessing(true)
     setOrderError(null)
 
     try {
-      // Create order via API
-      const response = await fetch('/api/orders', {
+      const response = await fetch('/api/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           packageCode: plan.packageCode,
           slug: plan.slug,
-          email,
           promoCode: promoApplied ? promoCode : undefined,
         }),
       })
 
       const data = await response.json()
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Failed to create order')
+      if (response.status === 402 && data.error === 'insufficient_balance') {
+        // Not enough balance - show topup modal
+        setRequiredAmount(data.required)
+        setShowTopupModal(true)
+        setIsProcessing(false)
+        return
       }
 
-      // Redirect to success with order info
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Failed to process purchase')
+      }
+
+      // Success! Redirect to success page
       const params = new URLSearchParams({
         order: data.orderId,
         country: plan.country,
@@ -178,26 +180,67 @@ function CheckoutContent() {
         days: plan.days.toString(),
       })
 
-      if (data.esim?.qrCodeUrl) {
-        params.set('qr', data.esim.qrCodeUrl)
-      }
-
       router.push(`/checkout/success?${params.toString()}`)
     } catch (err) {
-      setOrderError(err instanceof Error ? err.message : 'Failed to process order')
+      setOrderError(err instanceof Error ? err.message : 'Failed to process purchase')
       setIsProcessing(false)
     }
   }
 
-  if (loading) {
+  const handleTopupComplete = () => {
+    // Refresh wallet balance after topup
+    setShowTopupModal(false)
+    // Re-fetch balance
+    fetch('/api/wallet')
+      .then(res => res.json())
+      .then(data => setWalletBalance(data.balance))
+      .catch(console.error)
+  }
+
+  if (loading || sessionStatus === 'loading') {
     return (
       <>
         <Navbar />
         <div className="pt-20 min-h-screen bg-gray-50 flex items-center justify-center">
           <div className="text-center">
             <CircleNotch weight="bold" className="w-8 h-8 animate-spin text-indigo-600 mx-auto mb-4" />
-            <p className="text-gray-500">Loading plan details...</p>
+            <p className="text-gray-500">Loading...</p>
           </div>
+        </div>
+      </>
+    )
+  }
+
+  // Not logged in - show login prompt
+  if (sessionStatus === 'unauthenticated') {
+    return (
+      <>
+        <Navbar />
+        <div className="pt-20 min-h-screen bg-gray-50 flex items-center justify-center">
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="max-w-md w-full mx-4 bg-white rounded-2xl p-8 shadow-lg border border-gray-100 text-center"
+          >
+            <div className="w-16 h-16 rounded-full bg-indigo-100 flex items-center justify-center mx-auto mb-6">
+              <SignIn weight="duotone" className="w-8 h-8 text-indigo-600" />
+            </div>
+            <h1 className="text-2xl font-bold text-gray-900 mb-2">
+              Sign In Required
+            </h1>
+            <p className="text-gray-500 mb-6">
+              Please sign in to your account to complete your purchase. Your eSIM will be available in your dashboard.
+            </p>
+            <button
+              onClick={() => signIn(undefined, { callbackUrl: window.location.href })}
+              className="btn btn-primary w-full mb-4"
+            >
+              Sign In to Continue
+            </button>
+            <Link href="/destinations" className="text-indigo-600 hover:text-indigo-700 text-sm font-medium">
+              Browse more destinations
+            </Link>
+          </motion.div>
         </div>
       </>
     )
@@ -251,192 +294,114 @@ function CheckoutContent() {
                 animate={{ opacity: 1, y: 0 }}
                 className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100"
               >
-                {/* Progress Steps */}
-                <div className="flex items-center gap-4 mb-8">
-                  <div className={`flex items-center gap-2 ${step >= 1 ? 'text-indigo-600' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                      step >= 1 ? 'bg-indigo-600 text-white' : 'bg-gray-100'
-                    }`}>
-                      {step > 1 ? <Check weight="bold" className="w-4 h-4" /> : '1'}
-                    </div>
-                    <span className="font-medium hidden sm:inline">Email</span>
-                  </div>
-                  <div className="flex-1 h-0.5 bg-gray-200">
-                    <div className={`h-full bg-indigo-600 transition-all ${step > 1 ? 'w-full' : 'w-0'}`} />
-                  </div>
-                  <div className={`flex items-center gap-2 ${step >= 2 ? 'text-indigo-600' : 'text-gray-400'}`}>
-                    <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${
-                      step >= 2 ? 'bg-indigo-600 text-white' : 'bg-gray-100'
-                    }`}>
-                      {step > 2 ? <Check weight="bold" className="w-4 h-4" /> : '2'}
-                    </div>
-                    <span className="font-medium hidden sm:inline">Payment</span>
-                  </div>
-                </div>
+                <h2 className="text-xl font-bold mb-6">Complete Your Purchase</h2>
 
                 {orderError && (
-                  <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
+                  <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm flex items-center gap-2">
+                    <WarningCircle weight="fill" className="w-5 h-5" />
                     {orderError}
                   </div>
                 )}
 
-                <form onSubmit={handleSubmit}>
-                  {/* Step 1: Email */}
-                  {step === 1 && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                    >
-                      <h2 className="text-xl font-bold mb-2">Where should we send your eSIM?</h2>
-                      <p className="text-gray-500 mb-6">
-                        Your QR code and installation instructions will be sent here.
-                      </p>
-
-                      <div className="relative mb-6">
-                        <Envelope weight="bold" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                        <input
-                          type="email"
-                          placeholder="your@email.com"
-                          value={email}
-                          onChange={(e) => setEmail(e.target.value)}
-                          className="input pl-12"
-                          required
-                        />
+                {/* Wallet Balance Card */}
+                <div className="mb-6 p-5 rounded-xl bg-gradient-to-br from-indigo-50 to-purple-50 border border-indigo-100">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-lg bg-indigo-600 flex items-center justify-center">
+                        <Wallet weight="duotone" className="w-5 h-5 text-white" />
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={() => email && setStep(2)}
-                        disabled={!email}
-                        className="btn btn-primary w-full"
-                      >
-                        Continue to Payment
-                        <CaretRight weight="bold" className="w-4 h-4" />
-                      </button>
-                    </motion.div>
-                  )}
-
-                  {/* Step 2: Payment */}
-                  {step === 2 && (
-                    <motion.div
-                      initial={{ opacity: 0, x: 20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      exit={{ opacity: 0, x: -20 }}
-                    >
-                      <h2 className="text-xl font-bold mb-2">Payment Details</h2>
-                      <p className="text-gray-500 mb-6">
-                        Secure payment powered by Stripe.
-                      </p>
-
-                      <div className="space-y-4">
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Name on card
-                          </label>
-                          <input
-                            type="text"
-                            placeholder="John Doe"
-                            value={name}
-                            onChange={(e) => setName(e.target.value)}
-                            className="input"
-                            required
-                          />
-                        </div>
-
-                        <div>
-                          <label className="block text-sm font-medium text-gray-700 mb-1">
-                            Card number
-                          </label>
-                          <div className="relative">
-                            <CreditCard weight="bold" className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <input
-                              type="text"
-                              placeholder="1234 5678 9012 3456"
-                              value={cardNumber}
-                              onChange={(e) => setCardNumber(formatCardNumber(e.target.value))}
-                              maxLength={19}
-                              className="input pl-12"
-                              required
-                            />
-                          </div>
-                        </div>
-
-                        <div className="grid grid-cols-2 gap-4">
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              Expiry
-                            </label>
-                            <input
-                              type="text"
-                              placeholder="MM/YY"
-                              value={expiry}
-                              onChange={(e) => setExpiry(formatExpiry(e.target.value))}
-                              maxLength={5}
-                              className="input"
-                              required
-                            />
-                          </div>
-                          <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-1">
-                              CVC
-                            </label>
-                            <div className="relative">
-                              <Lock weight="bold" className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                              <input
-                                type="text"
-                                placeholder="123"
-                                value={cvc}
-                                onChange={(e) => setCvc(e.target.value.replace(/\D/g, '').slice(0, 4))}
-                                maxLength={4}
-                                className="input pl-10"
-                                required
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 mt-6">
-                        <button
-                          type="button"
-                          onClick={() => setStep(1)}
-                          className="btn btn-secondary"
-                        >
-                          Back
-                        </button>
-                        <button
-                          type="submit"
-                          disabled={isProcessing || !name || !cardNumber || !expiry || !cvc}
-                          className="btn btn-primary flex-1"
-                        >
-                          {isProcessing ? (
-                            <>
-                              <CircleNotch weight="bold" className="w-5 h-5 animate-spin" />
-                              Processing...
-                            </>
+                      <div>
+                        <p className="text-sm text-gray-600">Your Wallet Balance</p>
+                        <p className="text-2xl font-bold text-gray-900">
+                          {walletLoading ? (
+                            <span className="inline-block w-20 h-7 bg-gray-200 rounded animate-pulse" />
                           ) : (
-                            <>
-                              Pay ${total.toFixed(2)}
-                              <Lock weight="bold" className="w-4 h-4" />
-                            </>
+                            `$${(walletBalance / 100).toFixed(2)}`
                           )}
-                        </button>
+                        </p>
                       </div>
-                    </motion.div>
+                    </div>
+                    <button
+                      onClick={() => setShowTopupModal(true)}
+                      className="flex items-center gap-1.5 px-4 py-2 rounded-lg bg-white border border-indigo-200 text-indigo-600 font-medium text-sm hover:bg-indigo-50 transition-colors"
+                    >
+                      <Plus weight="bold" className="w-4 h-4" />
+                      Add Funds
+                    </button>
+                  </div>
+
+                  {!walletLoading && !hasEnoughBalance && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-yellow-50 border border-yellow-200 text-yellow-800 text-sm">
+                      <WarningCircle weight="fill" className="w-4 h-4" />
+                      <span>
+                        You need <strong>${((totalCents - walletBalance) / 100).toFixed(2)}</strong> more for this purchase
+                      </span>
+                    </div>
                   )}
-                </form>
+
+                  {!walletLoading && hasEnoughBalance && (
+                    <div className="flex items-center gap-2 p-3 rounded-lg bg-green-50 border border-green-200 text-green-700 text-sm">
+                      <Check weight="bold" className="w-4 h-4" />
+                      <span>Sufficient balance for this purchase</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Payment Info */}
+                <div className="mb-6 p-4 rounded-xl bg-gray-50 border border-gray-100">
+                  <p className="text-sm text-gray-600 mb-2">
+                    <strong>How it works:</strong>
+                  </p>
+                  <ul className="text-sm text-gray-500 space-y-1">
+                    <li className="flex items-center gap-2">
+                      <Check weight="bold" className="w-4 h-4 text-indigo-600" />
+                      Payment deducted instantly from your wallet
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check weight="bold" className="w-4 h-4 text-indigo-600" />
+                      eSIM delivered to your dashboard immediately
+                    </li>
+                    <li className="flex items-center gap-2">
+                      <Check weight="bold" className="w-4 h-4 text-indigo-600" />
+                      QR code ready for instant installation
+                    </li>
+                  </ul>
+                </div>
+
+                {/* Pay Button */}
+                <button
+                  onClick={handlePurchase}
+                  disabled={isProcessing || walletLoading}
+                  className="w-full py-4 rounded-xl bg-gradient-to-r from-indigo-600 to-purple-600 text-white font-semibold text-lg flex items-center justify-center gap-2 hover:shadow-lg hover:shadow-indigo-200 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  {isProcessing ? (
+                    <>
+                      <CircleNotch weight="bold" className="w-5 h-5 animate-spin" />
+                      Processing...
+                    </>
+                  ) : hasEnoughBalance ? (
+                    <>
+                      Pay ${total.toFixed(2)} from Wallet
+                      <Lock weight="bold" className="w-4 h-4" />
+                    </>
+                  ) : (
+                    <>
+                      <Plus weight="bold" className="w-5 h-5" />
+                      Add Funds to Purchase
+                    </>
+                  )}
+                </button>
 
                 {/* Trust Badges */}
                 <div className="mt-8 pt-6 border-t border-gray-100">
                   <div className="flex items-center justify-center gap-6 text-gray-400">
                     <div className="flex items-center gap-2 text-sm">
                       <Lock weight="bold" className="w-4 h-4" />
-                      <span>SSL Encrypted</span>
+                      <span>Secure</span>
                     </div>
                     <div className="flex items-center gap-2 text-sm">
                       <ShieldCheck weight="bold" className="w-4 h-4" />
-                      <span>Secure Checkout</span>
+                      <span>Money-Back Guarantee</span>
                     </div>
                   </div>
                 </div>
@@ -530,7 +495,7 @@ function CheckoutContent() {
                 {/* Features */}
                 <div className="space-y-3 pt-4 border-t border-gray-100">
                   {[
-                    { icon: Lightning, text: 'Instant delivery to your email' },
+                    { icon: Lightning, text: 'Instant delivery to dashboard' },
                     { icon: ShieldCheck, text: '30-day money-back guarantee' },
                   ].map((item, i) => (
                     <div key={i} className="flex items-center gap-3 text-gray-600 text-sm">
@@ -544,6 +509,15 @@ function CheckoutContent() {
           </div>
         </div>
       </main>
+
+      {/* Wallet Topup Modal */}
+      <WalletTopupModal
+        isOpen={showTopupModal}
+        onClose={() => setShowTopupModal(false)}
+        currentBalance={walletBalance}
+        minimumRequired={requiredAmount || totalCents}
+        onTopupInitiated={handleTopupComplete}
+      />
     </>
   )
 }

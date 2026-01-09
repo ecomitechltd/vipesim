@@ -1,15 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
-import { getPackages, priceToUSD, bytesToGB, getCountryName } from '@/lib/esim-api'
+import { getPackages, priceToUSD, bytesToGB, getCountryName, orderProfiles, queryProfiles } from '@/lib/esim-api'
 
-const G2PAY_API_URL = process.env.G2PAY_API_URL || 'https://engine.g2pay.io/api/v1'
-const G2PAY_API_KEY = process.env.G2PAY_API_KEY || ''
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://esimfly.co'
-const IS_DEV = process.env.NODE_ENV === 'development'
-
-// Check if we should use dummy payment mode
-const useDummyPayment = () => IS_DEV || !G2PAY_API_KEY
+const BASE_URL = process.env.NEXTAUTH_URL || 'https://esimfly.me'
 
 export async function POST(request: NextRequest) {
   try {
@@ -59,31 +53,75 @@ export async function POST(request: NextRequest) {
     const totalPrice = priceUSD - discountAmount
     const totalPriceCents = Math.round(totalPrice * 100)
 
+    // Get user's wallet balance
+    const user = await prisma.user.findUnique({
+      where: { id: session.user.id },
+      select: { credits: true },
+    })
+
+    if (!user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 })
+    }
+
+    // Check if user has enough balance
+    if (user.credits < totalPriceCents) {
+      return NextResponse.json({
+        error: 'insufficient_balance',
+        required: totalPriceCents,
+        current: user.credits,
+        shortfall: totalPriceCents - user.credits,
+        shortfallFormatted: `$${((totalPriceCents - user.credits) / 100).toFixed(2)}`,
+        message: `Insufficient wallet balance. You need $${((totalPriceCents - user.credits) / 100).toFixed(2)} more.`,
+      }, { status: 402 })
+    }
+
     // Get country info from location
     const locationCode = pkg.location.split(',')[0].trim()
     const countryName = getCountryName(locationCode)
     const dataGB = bytesToGB(pkg.volume)
 
-    // Generate unique reference ID for G2Pay
+    // Generate unique reference ID
     const referenceId = `ESIMFLY-${Date.now()}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
 
-    // Create pending order in database
-    const order = await prisma.order.create({
-      data: {
-        userId: session.user.id,
-        status: 'PENDING',
-        total: totalPriceCents,
-        currency: 'USD',
-        promoCode: promoCode || null,
-        discount: Math.round(discountAmount * 100),
-        country: locationCode,
-        countryName,
-        planName: `${dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`} / ${pkg.duration} days`,
-        dataAmount: dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`,
-        validity: pkg.duration,
-        stripePaymentId: referenceId, // Using this field for G2Pay reference
-      },
-    })
+    // Deduct from wallet and create order in a transaction
+    const newBalance = user.credits - totalPriceCents
+
+    const [order] = await prisma.$transaction([
+      // Create order
+      prisma.order.create({
+        data: {
+          userId: session.user.id,
+          status: 'PAID', // Paid immediately from wallet
+          total: totalPriceCents,
+          currency: 'USD',
+          promoCode: promoCode || null,
+          discount: Math.round(discountAmount * 100),
+          country: locationCode,
+          countryName,
+          planName: `${dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`} / ${pkg.duration} days`,
+          dataAmount: dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`,
+          validity: pkg.duration,
+          stripePaymentId: referenceId,
+        },
+      }),
+      // Deduct from wallet
+      prisma.user.update({
+        where: { id: session.user.id },
+        data: { credits: newBalance },
+      }),
+      // Create wallet transaction
+      prisma.walletTransaction.create({
+        data: {
+          userId: session.user.id,
+          type: 'PURCHASE',
+          amount: -totalPriceCents, // Negative for debit
+          balance: newBalance,
+          description: `eSIM Purchase: ${countryName} - ${dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`}`,
+          referenceId,
+          status: 'COMPLETED',
+        },
+      }),
+    ])
 
     // Increment promo code usage if applied
     if (promoCode && discount > 0) {
@@ -93,77 +131,100 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // DUMMY PAYMENT MODE: Skip G2Pay and redirect directly to callback
-    if (useDummyPayment()) {
-      console.log('[DEV] Using dummy payment mode - skipping G2Pay')
-      const dummyRedirectUrl = `${BASE_URL}/api/checkout/callback?orderId=${order.id}&packageCode=${packageCode || slug}&dummy=true`
+    // Now provision the eSIM
+    try {
+      const transactionId = `esimfly-${order.userId}-${Date.now()}`
 
+      // Order from eSIM Access API
+      const orderResult = await orderProfiles({
+        transactionId,
+        amount: pkg.price,
+        packageInfoList: [{
+          packageCode: pkg.packageCode,
+          count: 1,
+          price: pkg.price,
+        }],
+      })
+
+      // Poll for eSIM profile
+      let esimProfile = null
+      let attempts = 0
+      const maxAttempts = 10
+
+      while (!esimProfile && attempts < maxAttempts) {
+        await new Promise(resolve => setTimeout(resolve, 3000))
+        attempts++
+
+        try {
+          const queryResult = await queryProfiles({
+            orderNo: orderResult.orderNo,
+            pager: { pageNum: 1, pageSize: 10 },
+          })
+
+          if (queryResult.esimList && queryResult.esimList.length > 0) {
+            esimProfile = queryResult.esimList[0]
+          }
+        } catch {
+          // Profile not ready yet, continue polling
+        }
+      }
+
+      if (esimProfile) {
+        // Create eSIM record
+        await prisma.eSim.create({
+          data: {
+            userId: order.userId,
+            orderId: order.id,
+            iccid: esimProfile.iccid,
+            qrCode: esimProfile.qrCodeUrl,
+            activationCode: esimProfile.ac,
+            status: 'INACTIVE',
+            dataUsed: BigInt(0),
+            dataLimit: BigInt(esimProfile.totalVolume),
+            expiresAt: new Date(esimProfile.expiredTime),
+            country: locationCode,
+            countryName,
+            planName: `${dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`} / ${pkg.duration} days`,
+          },
+        })
+
+        // Update order status to completed
+        await prisma.order.update({
+          where: { id: order.id },
+          data: { status: 'COMPLETED' },
+        })
+
+        return NextResponse.json({
+          success: true,
+          orderId: order.id,
+          message: 'Purchase successful! Your eSIM is ready.',
+          newBalance,
+          newBalanceFormatted: `$${(newBalance / 100).toFixed(2)}`,
+        })
+      } else {
+        // eSIM not ready yet - order is paid but pending provisioning
+        return NextResponse.json({
+          success: true,
+          orderId: order.id,
+          message: 'Payment successful! Your eSIM is being provisioned and will be ready shortly.',
+          newBalance,
+          newBalanceFormatted: `$${(newBalance / 100).toFixed(2)}`,
+          pending: true,
+        })
+      }
+    } catch (apiError) {
+      console.error('eSIM API error:', apiError)
+      // Payment was taken but eSIM provisioning failed
+      // Keep the order as PAID - support can manually provision
       return NextResponse.json({
         success: true,
         orderId: order.id,
-        redirectUrl: dummyRedirectUrl,
-        isDummy: true,
+        message: 'Payment successful! Your eSIM is being processed. Please check your orders page.',
+        newBalance,
+        newBalanceFormatted: `$${(newBalance / 100).toFixed(2)}`,
+        pending: true,
       })
     }
-
-    // PRODUCTION: Create G2Pay checkout request
-    const checkoutRequestData = {
-      referenceId,
-      paymentType: 'DEPOSIT',
-      currency: 'USD',
-      amount: totalPrice.toFixed(2),
-      returnUrl: `${BASE_URL}/account/orders`,
-      successReturnUrl: `${BASE_URL}/api/checkout/callback?orderId=${order.id}&packageCode=${packageCode || slug}`,
-      declineReturnUrl: `${BASE_URL}/checkout?error=payment_declined`,
-      webhookUrl: `${BASE_URL}/api/checkout/webhook`,
-    }
-
-    const response = await fetch(`${G2PAY_API_URL}/payments`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${G2PAY_API_KEY}`,
-      },
-      body: JSON.stringify(checkoutRequestData),
-    })
-
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('G2Pay API error:', errorText)
-
-      // Mark order as failed
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { status: 'FAILED' },
-      })
-
-      return NextResponse.json(
-        { error: 'Payment gateway error' },
-        { status: 500 }
-      )
-    }
-
-    const checkoutData = await response.json()
-
-    if (!checkoutData.result?.redirectUrl) {
-      console.error('G2Pay response missing redirect URL:', checkoutData)
-
-      await prisma.order.update({
-        where: { id: order.id },
-        data: { status: 'FAILED' },
-      })
-
-      return NextResponse.json(
-        { error: 'Invalid payment gateway response' },
-        { status: 500 }
-      )
-    }
-
-    return NextResponse.json({
-      success: true,
-      orderId: order.id,
-      redirectUrl: checkoutData.result.redirectUrl,
-    })
 
   } catch (error) {
     console.error('Checkout error:', error)

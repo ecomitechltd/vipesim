@@ -15,14 +15,44 @@ model User {
   name          String?
   password      String?
   image         String?
-  credits       Int       @default(0) // In cents
+  credits       Int       @default(0) // Wallet balance in cents
   referralCode  String    @unique @default(cuid())
   referredBy    String?
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
-  orders        Order[]
-  esims         ESim[]
+  orders              Order[]
+  esims               ESim[]
+  walletTransactions  WalletTransaction[]
+}
+
+model WalletTransaction {
+  id            String              @id @default(cuid())
+  userId        String
+  type          TransactionType
+  amount        Int                 // In cents (positive for credits, negative for debits)
+  balance       Int                 // Balance after transaction
+  description   String
+  referenceId   String?             // Order ID or payment reference
+  status        TransactionStatus   @default(PENDING)
+  createdAt     DateTime            @default(now())
+
+  user          User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+enum TransactionType {
+  TOPUP       // Adding funds via payment
+  PURCHASE    // Spending on eSIM
+  REFUND      // Refund from cancelled order
+  BONUS       // Promotional credit
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
 }
 
 model Order {
