@@ -194,61 +194,6 @@ export default function HomePage() {
                   </motion.div>
                 </motion.div>
 
-                {/* Trust indicators with fade in */}
-                <motion.div
-                  initial={{ opacity: 0, y: 15 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.6, delay: 1.4 }}
-                  className="flex flex-wrap items-center gap-8"
-                >
-                  <motion.div
-                    className="flex items-center gap-1"
-                    initial="hidden"
-                    animate="visible"
-                    variants={{
-                      hidden: { opacity: 0 },
-                      visible: {
-                        opacity: 1,
-                        transition: { staggerChildren: 0.1, delayChildren: 1.5 },
-                      },
-                    }}
-                  >
-                    {[...Array(5)].map((_, i) => (
-                      <motion.span
-                        key={i}
-                        variants={{
-                          hidden: { opacity: 0, scale: 0, rotate: -180 },
-                          visible: { opacity: 1, scale: 1, rotate: 0 },
-                        }}
-                        transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-                      >
-                        <Star weight="fill" className="w-5 h-5 text-yellow-400" />
-                      </motion.span>
-                    ))}
-                    <motion.span
-                      initial={{ opacity: 0, x: -5 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 2 }}
-                      className="ml-2 text-gray-700 font-bold"
-                    >
-                      4.9/5
-                    </motion.span>
-                  </motion.div>
-                  <motion.div
-                    initial={{ scaleY: 0 }}
-                    animate={{ scaleY: 1 }}
-                    transition={{ delay: 2.1, duration: 0.3 }}
-                    className="h-8 w-px bg-gray-200 origin-center"
-                  />
-                  <motion.div
-                    initial={{ opacity: 0, x: -10 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 2.2 }}
-                    className="text-gray-600"
-                  >
-                    <span className="font-extrabold text-gray-900">50,000+</span> Happy Travelers
-                  </motion.div>
-                </motion.div>
               </div>
 
               {/* Right - Phone mockup */}
