@@ -1,13 +1,16 @@
 import { Navbar } from '@/components/shared/Navbar'
-import { Footer } from '@/components/shared/Footer'
+import { ServerFooter } from '@/components/shared/ServerFooter'
 import { FileText } from 'lucide-react'
+import { getBusinessInfo } from '@/lib/settings'
 
 export const metadata = {
   title: 'Terms of Service - eSIMFly',
   description: 'Terms of Service for eSIMFly eSIM services',
 }
 
-export default function TermsPage() {
+export default async function TermsPage() {
+  const businessInfo = await getBusinessInfo()
+
   return (
     <>
       <Navbar />
@@ -36,7 +39,7 @@ export default function TermsPage() {
                   By accessing or using the eSIMFly website and services (the &quot;Service&quot;), you agree to be bound by these Terms of Service (&quot;Terms&quot;). If you disagree with any part of these terms, you may not access the Service.
                 </p>
                 <p>
-                  These Terms apply to all visitors, users, and others who access or use the Service. The Service is operated by [Company Name], located at [Company Address] (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;).
+                  These Terms apply to all visitors, users, and others who access or use the Service. The Service is operated by {businessInfo.businessName}, located at {businessInfo.businessAddress} (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;).
                 </p>
 
                 <h2>2. Description of Service</h2>
@@ -99,7 +102,7 @@ export default function TermsPage() {
 
                 <h2>7. Intellectual Property</h2>
                 <p>
-                  The Service and its original content, features, and functionality are owned by [Company Name] and are protected by international copyright, trademark, and other intellectual property laws.
+                  The Service and its original content, features, and functionality are owned by {businessInfo.businessName} and are protected by international copyright, trademark, and other intellectual property laws.
                 </p>
 
                 <h2>8. Prohibited Uses</h2>
@@ -116,7 +119,7 @@ export default function TermsPage() {
 
                 <h2>9. Limitation of Liability</h2>
                 <p>
-                  To the maximum extent permitted by law, [Company Name] shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, data, or other intangible losses resulting from:
+                  To the maximum extent permitted by law, {businessInfo.businessName} shall not be liable for any indirect, incidental, special, consequential, or punitive damages, including loss of profits, data, or other intangible losses resulting from:
                 </p>
                 <ul>
                   <li>Your use or inability to use the Service</li>
@@ -137,7 +140,7 @@ export default function TermsPage() {
 
                 <h2>12. Governing Law</h2>
                 <p>
-                  These Terms shall be governed by and construed in accordance with the laws of [Jurisdiction], without regard to its conflict of law provisions.
+                  These Terms shall be governed by and construed in accordance with the laws of the jurisdiction where {businessInfo.businessName} is registered, without regard to its conflict of law provisions.
                 </p>
 
                 <h2>13. Contact Us</h2>
@@ -145,8 +148,8 @@ export default function TermsPage() {
                   If you have questions about these Terms, please contact us at:
                 </p>
                 <ul>
-                  <li>Email: legal@esimfly.me</li>
-                  <li>Address: [Company Name], [Street Address], [City, Country, Postal Code]</li>
+                  <li>Email: {businessInfo.businessEmail}</li>
+                  <li>Address: {businessInfo.businessName}, {businessInfo.businessAddress}</li>
                 </ul>
               </div>
             </div>
@@ -154,7 +157,7 @@ export default function TermsPage() {
         </section>
       </main>
 
-      <Footer />
+      <ServerFooter />
     </>
   )
 }

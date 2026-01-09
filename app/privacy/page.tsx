@@ -1,13 +1,16 @@
 import { Navbar } from '@/components/shared/Navbar'
-import { Footer } from '@/components/shared/Footer'
+import { ServerFooter } from '@/components/shared/ServerFooter'
 import { Shield } from 'lucide-react'
+import { getBusinessInfo } from '@/lib/settings'
 
 export const metadata = {
   title: 'Privacy Policy - eSIMFly',
   description: 'Privacy Policy for eSIMFly eSIM services',
 }
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const businessInfo = await getBusinessInfo()
+
   return (
     <>
       <Navbar />
@@ -33,7 +36,7 @@ export default function PrivacyPage() {
               <div className="prose prose-gray max-w-none">
                 <h2>1. Introduction</h2>
                 <p>
-                  [Company Name] (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) operates the eSIMFly website and services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.
+                  {businessInfo.businessName} (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) operates the eSIMFly website and services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.
                 </p>
                 <p>
                   We are committed to protecting your privacy and ensuring that your personal information is handled responsibly and in compliance with applicable data protection laws.
@@ -135,7 +138,7 @@ export default function PrivacyPage() {
                   <li>Withdraw consent where applicable</li>
                 </ul>
                 <p>
-                  To exercise these rights, please contact us at privacy@esimfly.me.
+                  To exercise these rights, please contact us at {businessInfo.businessEmail}.
                 </p>
 
                 <h2>8. Cookies and Tracking</h2>
@@ -172,8 +175,8 @@ export default function PrivacyPage() {
                   If you have questions about this Privacy Policy or our data practices, please contact us at:
                 </p>
                 <ul>
-                  <li>Email: privacy@esimfly.me</li>
-                  <li>Address: [Company Name], [Street Address], [City, Country, Postal Code]</li>
+                  <li>Email: {businessInfo.businessEmail}</li>
+                  <li>Address: {businessInfo.businessName}, {businessInfo.businessAddress}</li>
                 </ul>
               </div>
             </div>
@@ -181,7 +184,7 @@ export default function PrivacyPage() {
         </section>
       </main>
 
-      <Footer />
+      <ServerFooter />
     </>
   )
 }

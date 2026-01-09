@@ -1,13 +1,16 @@
 import { Navbar } from '@/components/shared/Navbar'
-import { Footer } from '@/components/shared/Footer'
+import { ServerFooter } from '@/components/shared/ServerFooter'
 import { RefreshCw, CheckCircle, XCircle, Clock, Mail } from 'lucide-react'
+import { getBusinessInfo } from '@/lib/settings'
 
 export const metadata = {
   title: 'Refund Policy - eSIMFly',
   description: 'Refund Policy for eSIMFly eSIM services',
 }
 
-export default function RefundPage() {
+export default async function RefundPage() {
+  const businessInfo = await getBusinessInfo()
+
   return (
     <>
       <Navbar />
@@ -125,7 +128,7 @@ export default function RefundPage() {
                   <li>Select the order you wish to refund</li>
                   <li>Click &quot;Request Refund&quot; and provide the reason</li>
                 </ol>
-                <p>Alternatively, you can email us at support@esimfly.me with:</p>
+                <p>Alternatively, you can email us at {businessInfo.businessEmail} with:</p>
                 <ul>
                   <li>Your order number</li>
                   <li>Email address used for the purchase</li>
@@ -173,8 +176,8 @@ export default function RefundPage() {
                   If you have questions about our Refund Policy or need assistance with a refund request, please contact us:
                 </p>
                 <ul>
-                  <li>Email: support@esimfly.me</li>
-                  <li>Address: [Company Name], [Street Address], [City, Country, Postal Code]</li>
+                  <li>Email: {businessInfo.businessEmail}</li>
+                  <li>Address: {businessInfo.businessName}, {businessInfo.businessAddress}</li>
                 </ul>
               </div>
 
@@ -190,7 +193,7 @@ export default function RefundPage() {
                       Our support team is available 24/7 to assist you with refund requests or any other questions.
                     </p>
                     <a
-                      href="mailto:support@esimfly.me"
+                      href={`mailto:${businessInfo.businessEmail}`}
                       className="inline-flex items-center gap-2 text-indigo-600 font-medium hover:text-indigo-700"
                     >
                       Contact Support
@@ -204,7 +207,7 @@ export default function RefundPage() {
         </section>
       </main>
 
-      <Footer />
+      <ServerFooter />
     </>
   )
 }

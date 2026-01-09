@@ -1,8 +1,20 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { Plane, Mail, MapPin } from 'lucide-react'
+import type { BusinessInfo } from '@/lib/settings'
 
-export function Footer() {
+interface FooterProps {
+  businessInfo?: BusinessInfo
+}
+
+export function Footer({ businessInfo }: FooterProps) {
+  // Use provided business info or defaults
+  const company = {
+    name: businessInfo?.businessName || 'eSIMFly',
+    address: businessInfo?.businessAddress || '123 Digital Way, Tech City, TC 10001',
+    email: businessInfo?.businessEmail || 'support@esimfly.me',
+  }
+
   return (
     <footer className="bg-white border-t border-gray-100">
       <div className="container mx-auto px-6 py-12">
@@ -25,7 +37,7 @@ export function Footer() {
             <div className="space-y-2 text-sm text-gray-500 mb-4">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 mt-0.5 flex-shrink-0" />
-                <span>[Company Name]<br />[Street Address]<br />[City, Country, Postal Code]</span>
+                <span>{company.name}<br />{company.address}</span>
               </div>
             </div>
 
@@ -54,7 +66,7 @@ export function Footer() {
             <h4 className="font-semibold text-gray-900 mb-4">Support</h4>
             <ul className="space-y-2">
               <li><Link href="/help" className="text-gray-500 hover:text-indigo-600 text-sm">Help Center</Link></li>
-              <li><a href="mailto:support@esimfly.me" className="text-gray-500 hover:text-indigo-600 text-sm">Contact Us</a></li>
+              <li><a href={`mailto:${company.email}`} className="text-gray-500 hover:text-indigo-600 text-sm">Contact Us</a></li>
             </ul>
           </div>
 
@@ -72,11 +84,11 @@ export function Footer() {
           <div className="flex flex-col md:flex-row justify-between items-center gap-6">
             <div className="flex flex-col sm:flex-row items-center gap-4">
               <p className="text-gray-500 text-sm">
-                &copy; {new Date().getFullYear()} eSIMFly. All rights reserved.
+                &copy; {new Date().getFullYear()} {company.name}. All rights reserved.
               </p>
               <div className="flex items-center gap-2 text-gray-500 text-sm">
                 <Mail className="w-4 h-4" />
-                <span>support@esimfly.me</span>
+                <span>{company.email}</span>
               </div>
             </div>
 
