@@ -71,14 +71,14 @@ export async function POST(request: NextRequest) {
     }
 
     // PRODUCTION: Create G2Pay checkout request
+    // Per G2PAY docs: only returnUrl and webhookUrl are supported
+    // G2PAY will append status params to returnUrl after payment
     const checkoutRequestData = {
       referenceId,
       paymentType: 'DEPOSIT',
       currency: 'USD',
       amount: amount.toFixed(2),
-      returnUrl: `${BASE_URL}/dashboard?tab=wallet`,
-      successReturnUrl: `${BASE_URL}/api/wallet/topup/callback?transactionId=${transaction.id}`,
-      declineReturnUrl: `${BASE_URL}/dashboard?tab=wallet&error=payment_declined`,
+      returnUrl: `${BASE_URL}/api/wallet/topup/callback?transactionId=${transaction.id}`,
       webhookUrl: `${BASE_URL}/api/wallet/topup/webhook`,
     }
 

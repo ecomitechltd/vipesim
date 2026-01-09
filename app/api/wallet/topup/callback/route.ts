@@ -10,9 +10,20 @@ export async function GET(request: NextRequest) {
     const transactionId = searchParams.get('transactionId')
     const isDummy = searchParams.get('dummy') === 'true'
 
-    if (isDummy) {
-      console.log('[DEV] Processing dummy wallet top-up callback')
-    }
+    // G2PAY appends these params to returnUrl after payment
+    const paymentStatus = searchParams.get('status') // e.g., 'success', 'declined', 'pending'
+    const paymentId = searchParams.get('paymentId') || searchParams.get('payment_id')
+    const resultCode = searchParams.get('resultCode') || searchParams.get('result_code')
+
+    // Log all callback params for debugging
+    console.log('=== G2PAY CALLBACK DEBUG ===')
+    console.log('All params:', Object.fromEntries(searchParams.entries()))
+    console.log('transactionId:', transactionId)
+    console.log('paymentStatus:', paymentStatus)
+    console.log('paymentId:', paymentId)
+    console.log('resultCode:', resultCode)
+    console.log('isDummy:', isDummy)
+    console.log('============================')
 
     if (!transactionId) {
       return NextResponse.redirect(`${BASE_URL}/dashboard?tab=wallet&error=missing_transaction`)
@@ -35,6 +46,33 @@ export async function GET(request: NextRequest) {
 
     if (transaction.status !== 'PENDING') {
       return NextResponse.redirect(`${BASE_URL}/dashboard?tab=wallet&error=invalid_status`)
+    }
+
+    // Check for declined/failed status from G2PAY
+    // Common decline indicators: status=declined, status=failed, resultCode != 0
+    const isDeclined =
+      paymentStatus === 'declined' ||
+      paymentStatus === 'failed' ||
+      paymentStatus === 'cancelled' ||
+      paymentStatus === 'error' ||
+      (resultCode && resultCode !== '0' && resultCode !== 'success')
+
+    if (isDeclined && !isDummy) {
+      console.log(`Payment declined for transaction ${transactionId}: status=${paymentStatus}, resultCode=${resultCode}`)
+
+      // Mark transaction as failed
+      await prisma.walletTransaction.update({
+        where: { id: transactionId },
+        data: { status: 'FAILED' },
+      })
+
+      return NextResponse.redirect(`${BASE_URL}/dashboard?tab=wallet&error=payment_declined`)
+    }
+
+    // For dummy mode OR successful payment (status=success or no explicit decline)
+    // In production, we trust the callback for success, webhook provides confirmation
+    if (isDummy) {
+      console.log('[DEV] Processing dummy wallet top-up callback')
     }
 
     // Update user credits and transaction in a transaction

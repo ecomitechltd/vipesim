@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, Wallet, CreditCard, ArrowRight, WarningCircle, Sparkle } from '@phosphor-icons/react'
 
@@ -36,6 +36,17 @@ export function WalletTopupModal({
 
   const shortfall = minimumRequired ? Math.max(0, minimumRequired - currentBalance) : 0
   const suggestedAmount = shortfall > 0 ? Math.ceil(shortfall / 100) : 25
+
+  // Lock body scroll when modal is open
+  useEffect(() => {
+    if (isOpen) {
+      const originalOverflow = document.body.style.overflow
+      document.body.style.overflow = 'hidden'
+      return () => {
+        document.body.style.overflow = originalOverflow
+      }
+    }
+  }, [isOpen])
 
   // Get the actual amount to charge
   const getTopupAmount = () => {
@@ -106,22 +117,25 @@ export function WalletTopupModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto overscroll-contain">
-        {/* Backdrop */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 bg-black/60 backdrop-blur-sm"
-          onClick={onClose}
-        />
+      {/* Backdrop - fixed full screen */}
+      <motion.div
+        key="backdrop"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm"
+        onClick={onClose}
+      />
 
+      {/* Modal container - fixed, handles centering */}
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none">
         {/* Modal */}
         <motion.div
+          key="modal"
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden my-8"
+          className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden pointer-events-auto max-h-[90vh] overflow-y-auto"
         >
           {/* Header */}
           <div className="relative bg-gradient-to-br from-indigo-600 to-purple-700 px-6 py-8 text-white">
