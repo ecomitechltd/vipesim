@@ -106,13 +106,13 @@ export function WalletTopupModal({
 
   return (
     <AnimatePresence>
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 overflow-y-auto overscroll-contain">
         {/* Backdrop */}
         <motion.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
-          className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+          className="fixed inset-0 bg-black/60 backdrop-blur-sm"
           onClick={onClose}
         />
 
@@ -121,7 +121,7 @@ export function WalletTopupModal({
           initial={{ opacity: 0, scale: 0.95, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.95, y: 20 }}
-          className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden"
+          className="relative w-full max-w-md bg-white rounded-2xl shadow-2xl overflow-hidden my-8"
         >
           {/* Header */}
           <div className="relative bg-gradient-to-br from-indigo-600 to-purple-700 px-6 py-8 text-white">
@@ -134,23 +134,23 @@ export function WalletTopupModal({
 
             <div className="flex items-center gap-3 mb-4">
               <div className="w-12 h-12 rounded-xl bg-white/20 flex items-center justify-center">
-                <Wallet weight="duotone" className="w-6 h-6" />
+                <Wallet weight="duotone" className="w-6 h-6 text-white" />
               </div>
               <div>
-                <h2 className="text-xl font-bold">Add Funds</h2>
-                <p className="text-white/70 text-sm">Top up your wallet</p>
+                <h2 className="text-xl font-bold text-white">Add Funds</h2>
+                <p className="text-white text-sm opacity-90">Top up your wallet</p>
               </div>
             </div>
 
             <div className="flex items-baseline gap-2">
-              <span className="text-3xl font-bold">${(currentBalance / 100).toFixed(2)}</span>
-              <span className="text-white/70">current balance</span>
+              <span className="text-3xl font-bold text-white">${(currentBalance / 100).toFixed(2)}</span>
+              <span className="text-white opacity-90">current balance</span>
             </div>
 
             {shortfall > 0 && (
               <div className="mt-3 flex items-center gap-2 px-3 py-2 rounded-lg bg-white/10">
                 <WarningCircle weight="fill" className="w-4 h-4 text-yellow-300" />
-                <span className="text-sm">
+                <span className="text-sm text-white">
                   You need at least <strong>${(shortfall / 100).toFixed(2)}</strong> more for this purchase
                 </span>
               </div>
