@@ -256,6 +256,24 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
     }
   }
 
+  async function downloadUserWalletStatement(userId: string) {
+    try {
+      const res = await fetch(`/api/admin/users/${userId}/wallet-statement`)
+      if (res.ok) {
+        const blob = await res.blob()
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `wallet-statement-${userId.slice(-8)}.pdf`
+        a.click()
+        window.URL.revokeObjectURL(url)
+      }
+    } catch (error) {
+      console.error('Failed to download wallet statement:', error)
+      alert('Failed to download wallet statement')
+    }
+  }
+
   const tabs = [
     { id: 'overview', label: 'Overview', icon: TrendingUp },
     { id: 'users', label: 'Users', icon: Users },
@@ -364,6 +382,7 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
             onToggleActive={toggleUserActive}
             onMakeAdmin={makeAdmin}
             onUpdateCredits={updateUserCredits}
+            onDownloadWalletStatement={downloadUserWalletStatement}
           />
         )}
       </main>
@@ -379,12 +398,14 @@ function UserModal({
   onToggleActive,
   onMakeAdmin,
   onUpdateCredits,
+  onDownloadWalletStatement,
 }: {
   user: UserData
   onClose: () => void
   onToggleActive: (id: string, active: boolean) => void
   onMakeAdmin: (id: string) => void
   onUpdateCredits: (id: string, credits: number) => void
+  onDownloadWalletStatement: (id: string) => void
 }) {
   const [credits, setCredits] = useState(user.credits / 100)
 
@@ -456,6 +477,15 @@ function UserModal({
               <p className="font-mono font-semibold">{user.referralCode}</p>
             </div>
           )}
+
+          {/* Download Wallet Statement */}
+          <button
+            onClick={() => onDownloadWalletStatement(user.id)}
+            className="w-full flex items-center justify-center gap-2 py-2 bg-indigo-50 text-indigo-700 rounded-lg font-medium hover:bg-indigo-100 transition-colors"
+          >
+            <Download className="w-4 h-4" />
+            Download Wallet Statement
+          </button>
 
           <div className="flex gap-2 pt-4 border-t border-gray-200">
             <button

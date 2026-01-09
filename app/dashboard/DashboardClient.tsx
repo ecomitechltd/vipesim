@@ -97,6 +97,7 @@ export function DashboardClient({ user, esims, orders, stats, paymentError, paym
   const [giftSuccess, setGiftSuccess] = useState(false)
   const [giftError, setGiftError] = useState('')
   const [downloadingInvoice, setDownloadingInvoice] = useState<string | null>(null)
+  const [downloadingStatement, setDownloadingStatement] = useState(false)
   const [showPaymentModal, setShowPaymentModal] = useState(!!paymentError || !!paymentSuccess)
 
   const copyToClipboard = (text: string) => {
@@ -162,6 +163,28 @@ export function DashboardClient({ user, esims, orders, stats, paymentError, paym
       console.error('Invoice download error:', err)
     } finally {
       setDownloadingInvoice(null)
+    }
+  }
+
+  const downloadWalletStatement = async () => {
+    setDownloadingStatement(true)
+    try {
+      const res = await fetch('/api/wallet/statement')
+      if (!res.ok) throw new Error('Failed to download statement')
+
+      const blob = await res.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = `eSIMFly-Wallet-Statement-${new Date().toISOString().split('T')[0]}.pdf`
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+    } catch (err) {
+      console.error('Statement download error:', err)
+    } finally {
+      setDownloadingStatement(false)
     }
   }
 
@@ -544,8 +567,22 @@ export function DashboardClient({ user, esims, orders, stats, paymentError, paym
 
               {/* Transaction History */}
               <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-                <div className="px-6 py-4 border-b border-gray-100">
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
                   <h3 className="text-lg font-semibold text-gray-900">Transaction History</h3>
+                  {walletTransactions.length > 0 && (
+                    <button
+                      onClick={downloadWalletStatement}
+                      disabled={downloadingStatement}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-colors disabled:opacity-50"
+                    >
+                      {downloadingStatement ? (
+                        <Loader2 className="w-4 h-4 animate-spin" />
+                      ) : (
+                        <Download className="w-4 h-4" />
+                      )}
+                      Download PDF
+                    </button>
+                  )}
                 </div>
                 {walletTransactions.length === 0 ? (
                   <div className="p-12 text-center">
