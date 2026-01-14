@@ -70,7 +70,7 @@ export default async function CountryDetailPage({ params }: Props) {
     }
 
     // Build country data
-    const plans = countryPackages.map(pkg => {
+    const rawPlans = countryPackages.map(pkg => {
       const dataGB = bytesToGB(pkg.volume)
       const basePriceUSD = priceToUSD(pkg.price)
       return {
@@ -82,11 +82,24 @@ export default async function CountryDetailPage({ params }: Props) {
         speed: pkg.speed,
         dataType: pkg.dataType,
       }
+    })
+
+    // Deduplicate plans (remove identical offers)
+    const seenPlanKeys = new Set<string>()
+    const plans = rawPlans.filter(plan => {
+      const key = `${plan.data}-${plan.days}-${plan.price}-${plan.speed}-${plan.dataType}`
+      if (seenPlanKeys.has(key)) return false
+      seenPlanKeys.add(key)
+      return true
     }).sort((a, b) => {
-      // Sort by data amount, then by price
-      const aData = parseFloat(a.data)
-      const bData = parseFloat(b.data)
-      if (aData !== bData) return aData - bData
+      // Sort by data amount (normalize to MB), then by price
+      const getMB = (s: string) => {
+        const val = parseFloat(s)
+        return s.includes('GB') ? val * 1024 : val
+      }
+      const aMB = getMB(a.data)
+      const bMB = getMB(b.data)
+      if (aMB !== bMB) return aMB - bMB
       return a.price - b.price
     })
 
