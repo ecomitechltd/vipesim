@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import { requireAdmin, logAdminAction, getSettings } from '@/lib/admin'
+import { revalidateTag } from 'next/cache'
 
 // GET /api/admin/settings - Get current settings
 export async function GET() {
@@ -93,6 +94,8 @@ export async function PATCH(request: NextRequest) {
       update: updateData,
       create: { id: 'default', ...updateData },
     })
+
+    revalidateTag('settings', { expire: 0 })
 
     await logAdminAction(
       adminResult.user.id,

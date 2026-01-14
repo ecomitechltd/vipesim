@@ -49,9 +49,10 @@ interface OtherDestination {
 interface CountryClientProps {
   country: CountryData
   otherDestinations: OtherDestination[]
+  notice?: string
 }
 
-export function CountryClient({ country, otherDestinations }: CountryClientProps) {
+export function CountryClient({ country, otherDestinations, notice }: CountryClientProps) {
   const router = useRouter()
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
 
@@ -93,7 +94,7 @@ export function CountryClient({ country, otherDestinations }: CountryClientProps
             >
               <FlagIcon code={country.code} className="w-24 h-16 rounded-lg shadow-xl" />
               <div>
-                <h1 className="text-4xl lg:text-5xl font-bold mb-2 text-white">
+                <h1 className="text-4xl lg:text-5xl font-bold mb-2 text-white drop-shadow-md">
                   {country.name} eSIM
                 </h1>
                 <p className="text-xl text-white/80">
@@ -109,58 +110,78 @@ export function CountryClient({ country, otherDestinations }: CountryClientProps
           <div className="container mx-auto px-6">
             <h2 className="text-2xl font-bold mb-6">Choose Your Plan</h2>
 
-            <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {plansWithPopular.map((plan, i) => (
-                <motion.div
-                  key={plan.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: i * 0.05 }}
-                  onClick={() => setSelectedPlan(plan.id)}
-                  className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 ${
-                    selectedPlan === plan.id
-                      ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200 scale-[1.02]'
-                      : plan.popular
-                      ? 'bg-white border-2 border-indigo-200 hover:border-indigo-400'
-                      : 'bg-white border border-gray-200 hover:border-indigo-300'
-                  }`}
-                >
-                  {plan.popular && selectedPlan !== plan.id && (
-                    <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">
-                      Popular
-                    </span>
-                  )}
+            {notice && (
+              <div className="mb-6 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-amber-900">
+                {notice}
+              </div>
+            )}
 
-                  <div className="text-center">
-                    <div className={`text-4xl font-bold mb-1 ${selectedPlan === plan.id ? 'text-white' : 'text-gray-900'}`}>
-                      {plan.data}
+            {plansWithPopular.length === 0 ? (
+              <div className="rounded-2xl border border-gray-200 bg-white p-8 text-center">
+                <p className="text-gray-700">Plans are temporarily unavailable for this destination.</p>
+                <div className="mt-5 flex justify-center gap-3">
+                  <Link href="/destinations" className="btn btn-secondary px-6 py-3">
+                    Back to destinations
+                  </Link>
+                  <Link href="/help" className="btn btn-primary px-6 py-3">
+                    Contact support
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <div className="grid sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {plansWithPopular.map((plan, i) => (
+                  <motion.div
+                    key={plan.id}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                    onClick={() => setSelectedPlan(plan.id)}
+                    className={`relative cursor-pointer rounded-2xl p-6 transition-all duration-300 ${
+                      selectedPlan === plan.id
+                        ? 'bg-indigo-600 text-white shadow-xl shadow-indigo-200 scale-[1.02]'
+                        : plan.popular
+                        ? 'bg-white border-2 border-indigo-200 hover:border-indigo-400'
+                        : 'bg-white border border-gray-200 hover:border-indigo-300'
+                    }`}
+                  >
+                    {plan.popular && selectedPlan !== plan.id && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 px-3 py-1 bg-indigo-600 text-white text-xs font-semibold rounded-full">
+                        Popular
+                      </span>
+                    )}
+
+                    <div className="text-center">
+                      <div className={`text-4xl font-bold mb-1 ${selectedPlan === plan.id ? 'text-white' : 'text-gray-900'}`}>
+                        {plan.data}
+                      </div>
+                      <div className={`text-sm mb-2 ${selectedPlan === plan.id ? 'text-white/70' : 'text-gray-500'}`}>
+                        {plan.days} days validity
+                      </div>
+                      <div className={`text-xs mb-4 ${selectedPlan === plan.id ? 'text-white/60' : 'text-gray-400'}`}>
+                        {plan.speed}
+                      </div>
+                      <div className={`text-3xl font-bold mb-4 ${selectedPlan === plan.id ? 'text-white' : 'text-indigo-600'}`}>
+                        ${plan.price.toFixed(2)}
+                      </div>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          handleBuyNow(plan)
+                        }}
+                        className={`w-full py-3 rounded-xl font-semibold transition-all ${
+                          selectedPlan === plan.id
+                            ? 'bg-white text-indigo-600 hover:bg-gray-100'
+                            : 'bg-indigo-600 text-white hover:bg-indigo-700'
+                        }`}
+                      >
+                        Buy Now
+                      </button>
                     </div>
-                    <div className={`text-sm mb-2 ${selectedPlan === plan.id ? 'text-white/70' : 'text-gray-500'}`}>
-                      {plan.days} days validity
-                    </div>
-                    <div className={`text-xs mb-4 ${selectedPlan === plan.id ? 'text-white/60' : 'text-gray-400'}`}>
-                      {plan.speed}
-                    </div>
-                    <div className={`text-3xl font-bold mb-4 ${selectedPlan === plan.id ? 'text-white' : 'text-indigo-600'}`}>
-                      ${plan.price.toFixed(2)}
-                    </div>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation()
-                        handleBuyNow(plan)
-                      }}
-                      className={`w-full py-3 rounded-xl font-semibold transition-all ${
-                        selectedPlan === plan.id
-                          ? 'bg-white text-indigo-600 hover:bg-gray-100'
-                          : 'bg-indigo-600 text-white hover:bg-indigo-700'
-                      }`}
-                    >
-                      Buy Now
-                    </button>
-                  </div>
-                </motion.div>
-              ))}
-            </div>
+                  </motion.div>
+                ))}
+              </div>
+            )}
           </div>
         </section>
 

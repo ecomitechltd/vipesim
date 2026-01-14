@@ -4,8 +4,8 @@ import { Shield } from 'lucide-react'
 import { getBusinessInfo } from '@/lib/settings'
 
 export const metadata = {
-  title: 'Privacy Policy - eSIMFly',
-  description: 'Privacy Policy for eSIMFly eSIM services',
+  title: 'Privacy Policy - Zineb eSim',
+  description: 'Privacy Policy for Zineb eSim eSIM services',
 }
 
 export default async function PrivacyPage() {
@@ -23,7 +23,7 @@ export default async function PrivacyPage() {
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                 <Shield className="w-6 h-6" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold">Privacy Policy</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md">Privacy Policy</h1>
             </div>
             <p className="text-indigo-100">Last updated: January 2026</p>
           </div>
@@ -36,7 +36,7 @@ export default async function PrivacyPage() {
               <div className="prose prose-gray max-w-none">
                 <h2>1. Introduction</h2>
                 <p>
-                  {businessInfo.businessName} (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) operates the eSIMFly website and services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.
+                  {businessInfo.businessName} (&quot;we,&quot; &quot;us,&quot; or &quot;our&quot;) operates the Zineb eSim website and services. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our Service.
                 </p>
                 <p>
                   We are committed to protecting your privacy and ensuring that your personal information is handled responsibly and in compliance with applicable data protection laws.

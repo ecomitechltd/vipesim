@@ -14,8 +14,8 @@ import {
 } from 'lucide-react'
 
 export const metadata = {
-  title: 'Help Center - eSIMFly',
-  description: 'Get help with eSIMFly eSIM services',
+  title: 'Help Center - Zineb eSim',
+  description: 'Get help with Zineb eSim eSIM services',
 }
 
 const categories = [
@@ -96,7 +96,7 @@ export default function HelpPage() {
             <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mx-auto mb-6">
               <HelpCircle className="w-8 h-8" />
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold mb-4">How can we help?</h1>
+            <h1 className="text-4xl md:text-5xl font-bold mb-4 text-white drop-shadow-md">How can we help?</h1>
             <p className="text-xl text-indigo-100 mb-8 max-w-2xl mx-auto">
               Find answers to common questions or get in touch with our support team.
             </p>
@@ -180,7 +180,7 @@ export default function HelpPage() {
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <a
-                  href="mailto:support@esimfly.me"
+                  href="mailto:support@zineb.store"
                   className="inline-flex items-center justify-center gap-2 bg-white text-indigo-600 px-6 py-3 rounded-xl font-semibold hover:bg-gray-100 transition-colors"
                 >
                   <Mail className="w-5 h-5" />

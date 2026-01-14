@@ -67,8 +67,8 @@ async function generateFavicons() {
 
   // Create web manifest
   const manifest = {
-    name: 'eSIMFly',
-    short_name: 'eSIMFly',
+    name: 'Zineb eSim',
+    short_name: 'Zineb eSim',
     icons: [
       {
         src: '/android-chrome-192x192.png',

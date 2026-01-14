@@ -1,15 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { auth } from '@/lib/auth'
 import { prisma } from '@/lib/db'
+import { stripe } from '@/lib/stripe'
 
-const G2PAY_API_URL = process.env.G2PAY_API_URL || 'https://engine.g2pay.io/api/v1'
-const G2PAY_API_KEY = process.env.G2PAY_API_KEY || 'mEPczY292Djm2fSzuvVKLRAQANDWmc2r'
-const G2PAY_SIGNING_KEY = process.env.G2PAY_SIGNING_KEY || 'fLWeMSP1UjG9'
-const BASE_URL = process.env.NEXTAUTH_URL || 'https://esimfly.me'
+const BASE_URL = process.env.NEXTAUTH_URL || 'https://zineb.store'
 const IS_DEV = process.env.NODE_ENV === 'development'
 
 // Check if we should use dummy payment mode
-const useDummyPayment = () => IS_DEV || !G2PAY_API_KEY
+const useDummyPayment = () => IS_DEV && !process.env.STRIPE_SECRET_KEY
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,7 +54,7 @@ export async function POST(request: NextRequest) {
       },
     })
 
-    // DUMMY PAYMENT MODE: Skip G2Pay and redirect directly to callback
+    // DUMMY PAYMENT MODE: Skip Stripe and redirect directly to callback
     if (useDummyPayment()) {
       console.log('[DEV] Using dummy payment mode for wallet top-up')
       const dummyRedirectUrl = `${BASE_URL}/api/wallet/topup/callback?transactionId=${transaction.id}&dummy=true`
@@ -70,76 +68,51 @@ export async function POST(request: NextRequest) {
       })
     }
 
-    // PRODUCTION: Create G2Pay checkout request
-    // Per G2PAY docs: only returnUrl and webhookUrl are supported
-    // G2PAY will append status params to returnUrl after payment
-    const checkoutRequestData = {
-      referenceId,
-      paymentType: 'DEPOSIT',
-      currency: 'USD',
-      amount: amount.toFixed(2),
-      returnUrl: `${BASE_URL}/api/wallet/topup/callback?transactionId=${transaction.id}`,
-      webhookUrl: `${BASE_URL}/api/wallet/topup/webhook`,
+    if (!stripe) {
+      await prisma.walletTransaction.update({
+        where: { id: transaction.id },
+        data: { status: 'FAILED' },
+      })
+
+      return NextResponse.json({ error: 'Stripe not configured' }, { status: 500 })
     }
 
-    // Debug logging
-    console.log('=== G2PAY DEBUG ===')
-    console.log('G2PAY_API_URL:', G2PAY_API_URL)
-    console.log('G2PAY_API_KEY length:', G2PAY_API_KEY?.length)
-    console.log('G2PAY_API_KEY first 10 chars:', G2PAY_API_KEY?.substring(0, 10))
-    console.log('G2PAY_API_KEY last 5 chars:', G2PAY_API_KEY?.slice(-5))
-    console.log('Full URL:', `${G2PAY_API_URL}/payments`)
-    console.log('Request body:', JSON.stringify(checkoutRequestData, null, 2))
-    console.log('Authorization header:', `Bearer ${G2PAY_API_KEY?.substring(0, 10)}...${G2PAY_API_KEY?.slice(-5)}`)
-    console.log('===================')
-
-    const response = await fetch(`${G2PAY_API_URL}/payments`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${G2PAY_API_KEY}`,
+    const checkoutSession = await stripe.checkout.sessions.create({
+      mode: 'payment',
+      payment_method_types: ['card'],
+      line_items: [
+        {
+          price_data: {
+            currency: 'usd',
+            product_data: { name: 'Wallet top-up' },
+            unit_amount: amountCents,
+          },
+          quantity: 1,
+        },
+      ],
+      metadata: {
+        transactionId: transaction.id,
+        userId: session.user.id,
+        referenceId,
+        type: 'WALLET_TOPUP',
       },
-      body: JSON.stringify(checkoutRequestData),
+      success_url: `${BASE_URL}/api/wallet/topup/callback?transactionId=${transaction.id}&session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${BASE_URL}/dashboard?tab=wallet&canceled=true`,
     })
 
-    if (!response.ok) {
-      const errorText = await response.text()
-      console.error('G2Pay API error:', errorText)
-      console.error('Response status:', response.status)
-      console.error('Response headers:', JSON.stringify(Object.fromEntries(response.headers.entries())))
-
-      // Mark transaction as failed
+    if (!checkoutSession.url) {
       await prisma.walletTransaction.update({
         where: { id: transaction.id },
         data: { status: 'FAILED' },
       })
 
-      return NextResponse.json(
-        { error: 'Payment gateway error. Please try again.' },
-        { status: 500 }
-      )
-    }
-
-    const checkoutData = await response.json()
-
-    if (!checkoutData.result?.redirectUrl) {
-      console.error('G2Pay response missing redirect URL:', checkoutData)
-
-      await prisma.walletTransaction.update({
-        where: { id: transaction.id },
-        data: { status: 'FAILED' },
-      })
-
-      return NextResponse.json(
-        { error: 'Invalid payment gateway response' },
-        { status: 500 }
-      )
+      return NextResponse.json({ error: 'Unable to start Stripe checkout' }, { status: 500 })
     }
 
     return NextResponse.json({
       success: true,
       transactionId: transaction.id,
-      redirectUrl: checkoutData.result.redirectUrl,
+      redirectUrl: checkoutSession.url,
       message: 'You will be redirected to complete payment. After successful payment, funds will be added to your wallet.',
     })
 

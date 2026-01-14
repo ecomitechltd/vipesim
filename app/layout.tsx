@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next"
 import { DM_Sans } from "next/font/google"
-import { SessionProvider } from "next-auth/react"
+import { AuthSessionProvider } from "@/components/providers/AuthSessionProvider"
 import "./globals.css"
 
 const dmSans = DM_Sans({
@@ -10,7 +10,7 @@ const dmSans = DM_Sans({
 })
 
 export const metadata: Metadata = {
-  title: "eSIMFly - Instant eSIM for Global Travelers",
+  title: "Zineb eSim - Instant eSIM for Global Travelers",
   description: "Get connected anywhere in the world with instant eSIM data plans. No physical SIM needed. Works in 190+ countries.",
   icons: {
     icon: [
@@ -37,9 +37,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${dmSans.variable} font-sans antialiased`}>
-        <SessionProvider>
+        <AuthSessionProvider>
           {children}
-        </SessionProvider>
+        </AuthSessionProvider>
       </body>
     </html>
   )

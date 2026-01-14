@@ -1,4 +1,4 @@
-import { getPackages, priceToUSD, getCountryName, getCountryFlag, getRegion } from '@/lib/esim-api'
+import { getAllPackagesCached, priceToUSD, getCountryName, getCountryFlag, getRegion } from '@/lib/esim-api'
 import { getSettings } from '@/lib/admin'
 import { DestinationsClient } from './DestinationsClient'
 
@@ -15,7 +15,7 @@ function applyMarkup(price: number, markupPercent: number): number {
 
 async function fetchDestinations() {
   const [{ packageList }, settings] = await Promise.all([
-    getPackages(),
+    getAllPackagesCached(),
     getSettings(),
   ])
 

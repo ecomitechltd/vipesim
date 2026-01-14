@@ -247,7 +247,7 @@ export function CoverageClient({ countries }: Props) {
                 <Globe className="w-4 h-4" />
                 <span className="text-sm font-medium">Global Coverage</span>
               </div>
-              <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white">
+              <h1 className="text-4xl md:text-5xl font-bold mb-6 text-white drop-shadow-md">
                 Stay Connected in {countries.length}+ Countries
               </h1>
               <p className="text-xl text-indigo-100 mb-8">
@@ -407,7 +407,7 @@ export function CoverageClient({ countries }: Props) {
           <div className="container mx-auto px-6">
             <div className="text-center mb-12">
               <h2 className="text-3xl font-bold text-gray-900 mb-4">
-                Why Choose eSIMFly Coverage?
+                Why Choose Zineb eSim Coverage?
               </h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
                 We partner with the best carriers worldwide to ensure you get reliable, fast connectivity wherever you travel.

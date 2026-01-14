@@ -152,6 +152,11 @@ export default function HomePage() {
                       </motion.span>
                     ))}
                   </motion.span>
+                  <br />
+                  <AnimatedText
+                    text="With ZiNEB eSIM"
+                    className="block text-2xl lg:text-3xl font-bold text-gray-900"
+                  />
                 </h1>
 
                 {/* Subtitle with smooth fade */}

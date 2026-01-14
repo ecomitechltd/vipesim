@@ -1,6 +1,7 @@
 import { NextResponse } from 'next/server'
 import { auth } from './auth'
 import { prisma } from './db'
+import { unstable_cache } from 'next/cache'
 
 // Helper to check if user is admin
 export async function requireAdmin() {
@@ -48,18 +49,67 @@ export async function logAdminAction(
 }
 
 // Get or create default settings
-export async function getSettings() {
-  let settings = await prisma.settings.findUnique({
-    where: { id: 'default' },
-  })
+const getSettingsCached = unstable_cache(
+  async () => {
+    const legacyAddress = '123 Digital Way, Tech City, TC 10001'
+    const defaultAddress = '20-22 WenlockRoad , London . N1 7GU , UK'
 
-  if (!settings) {
-    settings = await prisma.settings.create({
-      data: { id: 'default' },
+    if (!process.env.DATABASE_URL) {
+      return {
+        id: 'default',
+        markupPercent: 30,
+        regionalMarkup: null,
+        minOrderValue: 100,
+        freeDataThreshold: 5000,
+        freeDataBonus: 500,
+        referralBonus: 500,
+        refereeBonus: 200,
+        businessName: 'Zineb eSim',
+        businessAddress: defaultAddress,
+        businessEmail: 'support@zineb.store',
+        businessPhone: '+1 (555) 123-4567',
+        businessVAT: null,
+        updatedAt: new Date(),
+        updatedBy: null,
+      }
+    }
+
+    const settings = await prisma.settings.findUnique({
+      where: { id: 'default' },
     })
-  }
 
-  return settings
+    if (!settings) {
+      return {
+        id: 'default',
+        markupPercent: 30,
+        regionalMarkup: null,
+        minOrderValue: 100,
+        freeDataThreshold: 5000,
+        freeDataBonus: 500,
+        referralBonus: 500,
+        refereeBonus: 200,
+        businessName: 'Zineb eSim',
+        businessAddress: defaultAddress,
+        businessEmail: 'support@zineb.store',
+        businessPhone: '+1 (555) 123-4567',
+        businessVAT: null,
+        updatedAt: new Date(),
+        updatedBy: null,
+      }
+    }
+
+    if (settings.businessAddress === legacyAddress) {
+      return { ...settings, businessAddress: defaultAddress }
+    }
+
+    return settings
+  },
+  ['settings'],
+  { revalidate: 300, tags: ['settings'] }
+)
+
+export async function getSettings() {
+  return getSettingsCached()
 }
 
 // Apply markup to a base price

@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/db'
 import crypto from 'crypto'
 
-const G2PAY_SIGNING_KEY = process.env.G2PAY_SIGNING_KEY || 'fLWeMSP1UjG9'
+const G2PAY_SIGNING_KEY = process.env.G2PAY_SIGNING_KEY || ''
 
 // Verify HMAC-SHA256 signature from G2Pay
 function verifySignature(payload: string, signature: string | null): boolean {
@@ -33,13 +33,16 @@ export async function POST(request: NextRequest) {
     const rawBody = await request.text()
     const signature = request.headers.get('Signature')
 
-    // Verify signature if signing key is configured
-    if (G2PAY_SIGNING_KEY && G2PAY_SIGNING_KEY !== 'YOUR_SIGNING_KEY') {
+    if (process.env.NODE_ENV === 'production') {
+      if (!G2PAY_SIGNING_KEY) {
+        console.error('G2PAY_SIGNING_KEY not configured')
+        return NextResponse.json({ error: 'Signing key not configured' }, { status: 500 })
+      }
+
       if (!verifySignature(rawBody, signature)) {
         console.error('Invalid webhook signature')
         return NextResponse.json({ error: 'Invalid signature' }, { status: 401 })
       }
-      console.log('Webhook signature verified successfully')
     }
 
     const body = JSON.parse(rawBody)

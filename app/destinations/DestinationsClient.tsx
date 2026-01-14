@@ -87,11 +87,11 @@ export function DestinationsClient({ destinations, popularCountries }: Destinati
               animate={{ opacity: 1, y: 0 }}
               className="text-center text-white"
             >
-              <h1 className="text-4xl lg:text-5xl font-bold mb-4">
+              <h1 className="text-4xl lg:text-5xl font-bold mb-4 text-white drop-shadow-md">
                 Find Your Destination
               </h1>
               <p className="text-xl text-white/80 mb-8 max-w-2xl mx-auto">
-                Browse eSIM plans for {destinations.length}+ countries. Instant activation, great rates.
+                Browse Zineb eSIM plans for 177+ countries. Instant activation, great rates.
               </p>
 
               {/* Search Bar */}

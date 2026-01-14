@@ -14,10 +14,10 @@ async function main() {
   const hashedPassword = await bcrypt.hash('demo123', 10);
 
   const testUser = await prisma.user.upsert({
-    where: { email: 'demo@esimfly.me' },
+    where: { email: 'demo@zineb.store' },
     update: {},
     create: {
-      email: 'demo@esimfly.me',
+      email: 'demo@zineb.store',
       name: 'Demo User',
       password: hashedPassword,
       credits: 1500, // $15.00 in credits
@@ -147,7 +147,7 @@ async function main() {
         : null;
 
       // Generate realistic QR code data (base64 encoded)
-      const qrData = `LPA:1$esimfly.example.com$${order.id}`;
+      const qrData = `LPA:1$Zineb eSim.example.com$${order.id}`;
       const qrCode = Buffer.from(qrData).toString('base64');
 
       await prisma.eSim.create({
@@ -156,7 +156,7 @@ async function main() {
           orderId: order.id,
           iccid: `8901${Math.random().toString().slice(2, 18)}`,
           qrCode: qrCode,
-          activationCode: `LPA:1$esimfly.example.com$${order.id}`,
+          activationCode: `LPA:1$Zineb eSim.example.com$${order.id}`,
           status: orderData.esim.status,
           dataUsed: orderData.esim.dataUsed,
           dataLimit: orderData.esim.dataLimit,
@@ -206,7 +206,7 @@ async function main() {
   console.log('Seeding complete!');
   console.log('========================================');
   console.log('\nLogin credentials:');
-  console.log('  Email: demo@esimfly.me');
+  console.log('  Email: demo@zineb.store');
   console.log('  Password: demo123');
   console.log('\nThe test user has:');
   console.log('  - $15.00 in credits');

@@ -13,8 +13,8 @@ import {
 } from 'lucide-react'
 
 export const metadata = {
-  title: 'eSIM Installation Guide - eSIMFly',
-  description: 'Step-by-step guide to install your eSIMFly eSIM',
+  title: 'eSIM Installation Guide - Zineb eSim',
+  description: 'Step-by-step guide to install your Zineb eSim eSIM',
 }
 
 export default function InstallEsimPage() {
@@ -37,7 +37,7 @@ export default function InstallEsimPage() {
               <div className="w-12 h-12 bg-white/20 rounded-xl flex items-center justify-center">
                 <Smartphone className="w-6 h-6" />
               </div>
-              <h1 className="text-3xl md:text-4xl font-bold">eSIM Installation Guide</h1>
+              <h1 className="text-3xl md:text-4xl font-bold text-white drop-shadow-md">eSIM Installation Guide</h1>
             </div>
             <p className="text-indigo-100 max-w-2xl">
               Follow these simple steps to install and activate your eSIM. The process takes less than 5 minutes.
@@ -251,7 +251,7 @@ export default function InstallEsimPage() {
                   Browse Help Center
                 </Link>
                 <a
-                  href="mailto:support@esimfly.me"
+                  href="mailto:support@zineb.store"
                   className="btn btn-primary"
                 >
                   Contact Support

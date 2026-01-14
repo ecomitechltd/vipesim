@@ -10,9 +10,9 @@ interface FooterProps {
 export function Footer({ businessInfo }: FooterProps) {
   // Use provided business info or defaults
   const company = {
-    name: businessInfo?.businessName || 'eSIMFly',
-    address: businessInfo?.businessAddress || '123 Digital Way, Tech City, TC 10001',
-    email: businessInfo?.businessEmail || 'support@esimfly.me',
+    name: businessInfo?.businessName || 'Zineb eSim',
+    address: businessInfo?.businessAddress || '20-22 WenlockRoad , London . N1 7GU , UK',
+    email: businessInfo?.businessEmail || 'support@zineb.store',
   }
 
   return (
@@ -26,7 +26,7 @@ export function Footer({ businessInfo }: FooterProps) {
                 <Plane className="w-5 h-5 text-white" />
               </div>
               <span className="text-xl font-bold">
-                eSIM<span className="text-indigo-600">Fly</span>
+                ZiNEB <span className="text-indigo-600">eSIM</span>
               </span>
             </Link>
             <p className="text-gray-500 text-sm mb-4">

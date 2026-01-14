@@ -2,10 +2,13 @@
 // Script to create admin user
 // Usage: node scripts/seed-admin.mjs
 
-import 'dotenv/config'
+import dotenv from 'dotenv'
 import { PrismaClient } from '@prisma/client'
 import { PrismaNeon } from '@prisma/adapter-neon'
 import bcrypt from 'bcryptjs'
+
+dotenv.config({ path: '.env.local' })
+dotenv.config()
 
 const connectionString = process.env.DATABASE_URL
 if (!connectionString) {
@@ -17,9 +20,9 @@ const adapter = new PrismaNeon({ connectionString })
 const prisma = new PrismaClient({ adapter })
 
 async function main() {
-  const email = 'admin@esimfly.me'
-  const password = 'Admin123!'
-  const name = 'Admin'
+  const email = process.env.ADMIN_EMAIL || 'admin@zineb.store'
+  const password = process.env.ADMIN_PASSWORD || 'Admin123!'
+  const name = process.env.ADMIN_NAME || 'Admin'
 
   // Check if user exists
   const existing = await prisma.user.findUnique({
@@ -27,12 +30,12 @@ async function main() {
   })
 
   if (existing) {
-    // Update to admin
-    const updated = await prisma.user.update({
+    const hashedPassword = await bcrypt.hash(password, 10)
+    await prisma.user.update({
       where: { email },
-      data: { role: 'ADMIN' },
+      data: { role: 'ADMIN', password: hashedPassword, name },
     })
-    console.log(`User ${email} already exists, updated to ADMIN`)
+    console.log(`User ${email} already exists, updated to ADMIN and password reset`)
     return
   }
 

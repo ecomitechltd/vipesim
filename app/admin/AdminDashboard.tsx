@@ -161,7 +161,7 @@ export function AdminDashboard({ adminUser }: AdminDashboardProps) {
             const data = await settingsRes.json()
             setSettings({
               markupPercent: data.settings.markupPercent || 0,
-              businessName: data.settings.businessName || 'eSIMFly',
+              businessName: data.settings.businessName || 'Zineb eSim',
               businessAddress: data.settings.businessAddress || '',
               businessEmail: data.settings.businessEmail || '',
               businessPhone: data.settings.businessPhone || '',
@@ -910,7 +910,7 @@ function SettingsTab({
               value={settings.businessName}
               onChange={(e) => setSettings({ ...settings, businessName: e.target.value })}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-              placeholder="eSIMFly"
+              placeholder="Zineb eSim"
             />
           </div>
 
@@ -923,7 +923,7 @@ function SettingsTab({
               onChange={(e) => setSettings({ ...settings, businessAddress: e.target.value })}
               className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
               rows={2}
-              placeholder="123 Digital Way, Tech City, TC 10001"
+              placeholder="20-22 WenlockRoad , London . N1 7GU , UK"
             />
           </div>
 
@@ -937,7 +937,7 @@ function SettingsTab({
                 value={settings.businessEmail}
                 onChange={(e) => setSettings({ ...settings, businessEmail: e.target.value })}
                 className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                placeholder="support@esimfly.me"
+                placeholder="support@zineb.store"
               />
             </div>
 

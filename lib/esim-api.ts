@@ -37,6 +37,17 @@ export interface Package {
   fupPolicy?: string
 }
 
+export interface PackageLite {
+  packageCode: string
+  slug: string
+  price: number
+  volume: number
+  duration: number
+  location: string
+  speed: string
+  dataType: number
+}
+
 export interface OrderResponse {
   orderNo: string
   transactionId: string
@@ -156,16 +167,58 @@ async function fetchPackages(options?: {
   })
 }
 
-// Cached: Get all packages (no filter) - heavily cached for "other destinations" etc
+function toPackageLite(pkg: Package): PackageLite {
+  return {
+    packageCode: pkg.packageCode,
+    slug: pkg.slug,
+    price: pkg.price,
+    volume: pkg.volume,
+    duration: pkg.duration,
+    location: pkg.location,
+    speed: pkg.speed,
+    dataType: pkg.dataType,
+  }
+}
+
+async function fetchPackagesLite(options?: {
+  locationCode?: string
+  type?: 'BASE' | 'TOPUP'
+  packageCode?: string
+  slug?: string
+  iccid?: string
+  dataType?: number
+}): Promise<{ packageList: PackageLite[] }> {
+  const { packageList } = await fetchPackages(options)
+  return { packageList: packageList.map(toPackageLite) }
+}
+
+export async function getPackagesLite(options?: {
+  locationCode?: string
+  type?: 'BASE' | 'TOPUP'
+  packageCode?: string
+  slug?: string
+  iccid?: string
+  dataType?: number
+}): Promise<{ packageList: PackageLite[] }> {
+  return fetchPackagesLite(options)
+}
+
+export const getPackageDetailsCached = unstable_cache(
+  async (packageCode: string) => fetchPackages({ packageCode }),
+  ['package-details'],
+  { revalidate: CACHE_DURATION, tags: ['packages'] }
+)
+
+// Cached: Get all packages (no filter) - cached as lite to avoid >2MB cache writes
 export const getAllPackagesCached = unstable_cache(
-  async () => fetchPackages(),
+  async () => fetchPackagesLite(),
   ['all-packages'],
   { revalidate: CACHE_DURATION, tags: ['packages'] }
 )
 
-// Cached: Get packages by country code
+// Cached: Get packages by country code - cached as lite to avoid >2MB cache writes
 export const getPackagesByCountryCached = unstable_cache(
-  async (locationCode: string) => fetchPackages({ locationCode }),
+  async (locationCode: string) => fetchPackagesLite({ locationCode }),
   ['packages-by-country'],
   { revalidate: CACHE_DURATION, tags: ['packages'] }
 )

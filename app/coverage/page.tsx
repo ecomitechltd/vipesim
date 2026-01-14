@@ -1,11 +1,11 @@
-import { getPackages, priceToUSD, getCountryName, getCountryFlag, getRegion } from '@/lib/esim-api'
+import { getAllPackagesCached, priceToUSD, getCountryName, getCountryFlag, getRegion } from '@/lib/esim-api'
 import { getSettings } from '@/lib/admin'
 import { CoverageClient } from './CoverageClient'
 
 export const revalidate = 300 // Cache for 5 minutes
 
 export const metadata = {
-  title: 'Global Coverage - eSIMFly',
+  title: 'Global Coverage - Zineb eSim',
   description: 'Check our global eSIM coverage. Stay connected in 190+ countries with 4G/5G networks from premium carriers.',
 }
 
@@ -17,7 +17,7 @@ function applyMarkup(price: number, markupPercent: number): number {
 
 async function fetchCoverageCountries() {
   const [{ packageList }, settings] = await Promise.all([
-    getPackages(),
+    getAllPackagesCached(),
     getSettings(),
   ])
 
