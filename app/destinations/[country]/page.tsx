@@ -73,10 +73,14 @@ export default async function CountryDetailPage({ params }: Props) {
     const rawPlans = countryPackages.map(pkg => {
       const dataGB = bytesToGB(pkg.volume)
       const basePriceUSD = priceToUSD(pkg.price)
+      
+      const sizeStr = dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`
+      const data = pkg.dataType === 2 ? `${sizeStr}/Day` : sizeStr
+
       return {
         id: pkg.packageCode,
         slug: pkg.slug,
-        data: dataGB >= 1 ? `${dataGB}GB` : `${Math.round(dataGB * 1024)}MB`,
+        data,
         days: pkg.duration,
         price: applyMarkup(basePriceUSD, markupPercent),
         speed: pkg.speed,
@@ -88,7 +92,9 @@ export default async function CountryDetailPage({ params }: Props) {
     const bestPlansMap = new Map<string, typeof rawPlans[0]>()
 
     for (const plan of rawPlans) {
-      const key = `${plan.data}-${plan.days}-${plan.speed}-${plan.dataType}`
+      // Key includes data (with /Day) and days.
+      // We explicitly exclude speed to merge 4G/5G duplicates (preferring lower price).
+      const key = `${plan.data}-${plan.days}`
       const existing = bestPlansMap.get(key)
 
       if (!existing || plan.price < existing.price) {
