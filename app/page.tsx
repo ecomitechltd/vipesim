@@ -92,7 +92,7 @@ export default function HomePage() {
 
       <main className="pt-20">
         {/* Hero Section */}
-        <section className="relative overflow-hidden min-h-[85vh] flex items-start">
+        <section className="relative overflow-hidden min-h-[70vh] flex items-start">
           {/* Background */}
           <div className="absolute inset-0 mesh-gradient" />
           <div className="absolute inset-0 grid-pattern opacity-40" />
