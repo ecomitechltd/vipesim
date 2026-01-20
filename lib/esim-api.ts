@@ -361,12 +361,23 @@ export function getCountryName(code: string): string {
     TZ: 'Tanzania',
     GH: 'Ghana',
     NG: 'Nigeria',
+    // Regions
+    ASIA: 'Asia',
+    EUROPE: 'Europe',
+    GLOBAL: 'Global',
+    AFRICA: 'Africa',
+    NAM: 'North America',
+    SAM: 'South America',
+    OCEANIA: 'Oceania',
   }
   return countries[code] || code
 }
 
 // Helper: Get country flag emoji from ISO code
 export function getCountryFlag(code: string): string {
+  // Return globe for regions or non-standard codes
+  if (code.length !== 2) return '🌍'
+
   // Convert country code to regional indicator symbols
   const codePoints = [...code.toUpperCase()].map(
     char => 0x1F1E6 - 65 + char.charCodeAt(0)
@@ -399,6 +410,14 @@ export function getRegion(code: string): string {
     // Africa
     ZA: 'Africa', MA: 'Africa', KE: 'Africa', TZ: 'Africa',
     GH: 'Africa', NG: 'Africa',
+    // Self-map regions
+    ASIA: 'Asia',
+    EUROPE: 'Europe',
+    GLOBAL: 'Global',
+    AFRICA: 'Africa',
+    NAM: 'North America',
+    SAM: 'South America',
+    OCEANIA: 'Oceania',
   }
   return regions[code] || 'Other'
 }

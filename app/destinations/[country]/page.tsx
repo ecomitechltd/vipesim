@@ -1,5 +1,5 @@
 import { notFound } from 'next/navigation'
-import { getPackagesByCountryCached, getPackageDetailsCached, priceToUSD, bytesToGB, getCountryName, getCountryFlag } from '@/lib/esim-api'
+import { getPackagesByCountryCached, getAllPackagesCached, getPackageDetailsCached, priceToUSD, bytesToGB, getCountryName, getCountryFlag, getRegion } from '@/lib/esim-api'
 import { getSettings } from '@/lib/admin'
 import { POPULAR_DESTINATIONS } from '@/lib/constants'
 import { CountryClient } from './CountryClient'
@@ -32,7 +32,7 @@ export default async function CountryDetailPage({ params }: Props) {
   const { country } = await params
   const countryCode = country.toUpperCase()
 
-  if (!/^[A-Z]{2}$/.test(countryCode)) {
+  if (!/^[A-Z0-9]{2,}$/.test(countryCode)) {
     notFound()
   }
 
@@ -53,15 +53,46 @@ export default async function CountryDetailPage({ params }: Props) {
       notice = 'We’re having trouble loading plans right now. Please try again in a moment.'
     }
 
-    const packageList = packageListResult?.packageList ?? []
+    let packageList = packageListResult?.packageList ?? []
+
+    // Check if this is a region page (e.g. ASIA)
+    const regionName = getRegion(countryCode)
+    const isRegionPage = regionName.toUpperCase() === countryCode && regionName !== 'Other'
+
+    // If it's a region page and we have no packages (or want to ensure we get all countries in region),
+    // fetch all packages and filter by region.
+    if (isRegionPage && packageList.length === 0) {
+      try {
+        const allPackagesResult = await getAllPackagesCached()
+        packageList = allPackagesResult.packageList
+        // Clear notice if we successfully fetched fallback packages
+        if (packageList.length > 0) {
+          notice = undefined
+        }
+      } catch {
+        // Ignore error, use empty list
+      }
+    }
 
     const markupPercent = settings.markupPercent || 0
 
     // Filter packages that include this country
     const countryPackages = packageList.filter(pkg => {
       const locations = pkg.location.split(',').map(l => l.trim())
-      return locations.includes(countryCode)
+      
+      if (locations.includes(countryCode)) return true
+
+      if (isRegionPage) {
+        return locations.some(loc => getRegion(loc).toUpperCase() === countryCode)
+      }
+
+      return false
     })
+
+    // If we have packages, clear the initial error notice (unless it's a critical error)
+    if (countryPackages.length > 0 && notice === 'We’re having trouble loading plans right now. Please try again in a moment.') {
+      notice = undefined
+    }
 
     if (!notice && countryPackages.length === 0) {
       notFound()

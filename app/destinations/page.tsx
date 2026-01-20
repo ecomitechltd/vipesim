@@ -38,7 +38,7 @@ async function fetchDestinations() {
     for (const locationCode of locationCodes) {
       // Skip regional/global markers
       if (locationCode.startsWith('!')) continue
-      if (locationCode.length !== 2) continue // Skip invalid codes
+      if (locationCode.length < 2) continue // Skip invalid codes
 
       if (!countriesMap.has(locationCode)) {
         countriesMap.set(locationCode, {
